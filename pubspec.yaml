@@ -1,6 +1,6 @@
 name: checkin_tool
 description: "Tool điểm danh cho giảng viên"
-publish_to: 'none'
+publish_to: "none"
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -23,20 +23,33 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Database ORM & other data
   drift: ^2.28.0
   drift_flutter: ^0.2.5
+  shared_preferences: ^2.5.3
+
+  # Paths & file system
   path_provider: ^2.1.5
+  path: ^1.9.1
+  filesystem_picker: any
+
+  # Scanning QR for quick check-in
+  camera: ^0.11.3
+  zxing2: ^0.2.4
+
+  # State management
   riverpod: ^3.0.0
   flutter_riverpod: ^3.0.0
+
+  # UIs
+  flutter_gutter: ^2.2.0
+  material_symbols_icons: ^4.2874.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^5.0.0
-  google_mlkit_document_scanner: ^0.4.0
-  google_mlkit_text_recognition: ^0.15.0
-  provider: ^6.1.5
+  flutter_lints: ^6.0.0
   drift_dev: ^2.28.0
   build_runner: ^2.5.4
 
