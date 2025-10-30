@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../database.dart';
 
 class CourseClassCreatePage extends StatelessWidget {
+  static const routeName = '/classes/create';
   const CourseClassCreatePage({super.key});
 
   @override
@@ -97,53 +95,6 @@ class CourseClassCreatePage extends StatelessWidget {
                   },
                 ),
               ),
-        ),
-      ),
-    );
-  }
-}
-
-class HomePageState extends ChangeNotifier {
-  late Future<List<CourseClassData>> futureCourseClasses;
-
-  HomePageState() {
-    final database = AppDatabase();
-    final managers = database.managers;
-    futureCourseClasses = managers.courseClass.get();
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Danh sách lớp'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Welcome to the Home Page!',
-            ),
-            ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CourseClassCreatePage(),
-                    ),
-                  );
-                },
-                child: const Text('Go to Next Page'),
-              ),
-            ),
-          ],
         ),
       ),
     );

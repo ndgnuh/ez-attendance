@@ -1,4 +1,4 @@
-const routeNames = (
-  courseClassList: "/classes/list",
-  courseClassCreate: "/classes/create",
-);
+class RouteNames {
+  static const initialSetupPage = "/initial-setup";
+  static const courseClassList = "/classes/list";
+}

@@ -1,66 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'pages/home.dart';
-
-import 'database.dart';
+import 'pages/pages.dart';
+import 'providers/local_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final database = AppDatabase();
-  final s = await database.managers.semester.get();
-  print(s);
-  print(await getApplicationSupportDirectory());
-  runApp(const MyApp());
+  // File("./db.sqlite").deleteSync();
+
+  // final db = AppDatabase();
+  // final s = await db.managers.semester.get();
+  //
+  // db.course.insertAll([
+  //   CourseCompanion.insert(id: 'MI1111', name: 'Giải tích I'),
+  //   CourseCompanion.insert(id: 'MI1112', name: 'Giải tích I'),
+  //   CourseCompanion.insert(id: 'MI1113', name: 'Giải tích I'),
+  //   CourseCompanion.insert(id: 'MI1114', name: 'Giải tích I'),
+  //   CourseCompanion.insert(id: 'MI1111E', name: 'Giải tích I'),
+  // ]);
+  // print(s);
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    final commonButtonPadding = EdgeInsets.symmetric(
-      vertical: 16,
-      horizontal: 24,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final useDarkModeAsync = ref.watch(useDarkModeProvider);
+    final darkMode = useDarkModeAsync.when(
+      data: (useDarkMode) => useDarkMode ?? false,
+      loading: () => false,
+      error: (e, st) => false,
     );
 
+    final theme = darkMode ? ThemeData.dark() : ThemeData.light();
+
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            padding: commonButtonPadding,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            padding: commonButtonPadding,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(),
-          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          floatingLabelAlignment: FloatingLabelAlignment.start,
-          prefixIconConstraints: BoxConstraints(),
-          suffixIconConstraints: BoxConstraints(),
-        ),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      home: CourseClassCreatePage(),
+      title: 'Attendance Tool',
+      theme: theme,
+      initialRoute: RouteNames.initialSetupPage,
+      onGenerateRoute: onGenerateRoute,
     );
   }
 }
