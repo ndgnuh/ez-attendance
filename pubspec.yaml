@@ -45,6 +45,7 @@ dependencies:
   # UIs
   flutter_gutter: ^2.2.0
   material_symbols_icons: ^4.2874.0
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:

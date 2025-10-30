@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../database/database.dart';
 import '../providers/local_preferences.dart';
@@ -24,14 +27,26 @@ class InitialSetupPage extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(context.gutterLarge),
           child: Column(
+            spacing: context.gutterLarge,
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _AppStoragePicker(),
-              Divider(),
-              _DatabasePathPicker(),
-              Divider(),
-              _DarkModeSwitch(),
-              Divider(),
+              Card(
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _StoragePermissionTile(),
+                    Divider(),
+                    _AppStoragePicker(),
+                    Divider(),
+                    _DatabasePathPicker(),
+                    Divider(),
+                    _DarkModeSwitch(),
+                  ],
+                ),
+              ),
               _FinishSetupButton(),
             ],
           ),
@@ -50,6 +65,7 @@ class _AppStoragePicker extends ConsumerWidget {
       loading: () => null,
       error: (e, st) => null,
     );
+
     return ListTile(
       title: const Text('Thư mục lưu trữ dữ liệu'),
       subtitle: Text(value ?? 'Chưa chọn'),
@@ -66,24 +82,59 @@ class _AppStoragePicker extends ConsumerWidget {
   }
 }
 
-class _DatabasePathPicker extends ConsumerWidget {
-  Future<void> pickExistingDatabase(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
-    final initialDirectory = await ref.watch(appStoragePathProvider.future);
-
-    final colorScheme = ColorScheme.of(context);
-
-    final databasePath = await FilesystemPicker.open(
-      context: context,
-      rootDirectory: Directory(initialDirectory as String),
-      pickText: 'Chọn cơ sở dữ liệu',
+class _DarkModeSwitch extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final useDarkModeAsync = ref.watch(useDarkModeProvider);
+    final useDarkMode = useDarkModeAsync.when(
+      data: (useDarkMode) => useDarkMode ?? false,
+      loading: () => false,
+      error: (e, st) => false,
     );
 
-    if (databasePath != null) {
-      ref.read(appDatabasePathProvider.notifier).set(databasePath);
-    }
+    return SwitchListTile(
+      title: const Text('Sử dụng giao diện tối'),
+      value: useDarkMode,
+      onChanged: (value) => ref.read(useDarkModeProvider.notifier).set(value),
+    );
+  }
+}
+
+class _DatabasePathPicker extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appStoragePathAsync = ref.watch(appStoragePathProvider);
+
+    bool enabled = true;
+    enabled &= appStoragePathAsync.when(
+      data: (path) => path != null,
+      loading: () => false,
+      error: (e, st) => false,
+    );
+
+    enabled &= ref
+        .watch(storagePermissionProvider)
+        .when(
+          data: (status) => status.isGranted,
+          loading: () => false,
+          error: (e, st) => false,
+        );
+
+    final value = ref
+        .watch(appDatabasePathProvider)
+        .when(
+          data: (path) => path,
+          loading: () => null,
+          error: (e, st) => null,
+        );
+
+    return ListTile(
+      title: const Text('Cơ sở dữ liệu'),
+      subtitle: Text(value ?? 'Chọn hoặc tạo mới'),
+      trailing: Icon(Symbols.file_open),
+      enabled: enabled,
+      onTap: () => showOptions(context, ref),
+    );
   }
 
   Future<void> createNewDatabase(
@@ -106,30 +157,21 @@ class _DatabasePathPicker extends ConsumerWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final appStoragePathAsync = ref.watch(appStoragePathProvider);
-    final enabled = appStoragePathAsync.when(
-      data: (path) => path != null,
-      loading: () => false,
-      error: (e, st) => false,
+  Future<void> pickExistingDatabase(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final initialDirectory = await ref.watch(appStoragePathProvider.future);
+
+    final databasePath = await FilesystemPicker.open(
+      context: context,
+      rootDirectory: Directory(initialDirectory as String),
+      pickText: 'Chọn cơ sở dữ liệu',
     );
 
-    final value = ref
-        .watch(appDatabasePathProvider)
-        .when(
-          data: (path) => path,
-          loading: () => null,
-          error: (e, st) => null,
-        );
-
-    return ListTile(
-      title: const Text('Cơ sở dữ liệu'),
-      subtitle: Text(value ?? 'Chọn hoặc tạo mới'),
-      trailing: Icon(Symbols.file_open),
-      enabled: enabled,
-      onTap: () => showOptions(context, ref),
-    );
+    if (databasePath != null) {
+      ref.read(appDatabasePathProvider.notifier).set(databasePath);
+    }
   }
 
   void showOptions(BuildContext context, WidgetRef ref) {
@@ -159,24 +201,6 @@ class _DatabasePathPicker extends ConsumerWidget {
   }
 }
 
-class _DarkModeSwitch extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final useDarkModeAsync = ref.watch(useDarkModeProvider);
-    final useDarkMode = useDarkModeAsync.when(
-      data: (useDarkMode) => useDarkMode ?? false,
-      loading: () => false,
-      error: (e, st) => false,
-    );
-
-    return SwitchListTile(
-      title: const Text('Sử dụng giao diện tối'),
-      value: useDarkMode,
-      onChanged: (value) => ref.read(useDarkModeProvider.notifier).set(value),
-    );
-  }
-}
-
 class _FinishSetupButton extends ConsumerWidget {
   const _FinishSetupButton();
 
@@ -198,23 +222,52 @@ class _FinishSetupButton extends ConsumerWidget {
           orElse: () => false,
         );
 
-    return ListTile(
-      title: const Text('Hoàn tất thiết lập'),
-      trailing: Icon(
-        Symbols.check_circle,
-        color: finished ? Colors.green : Colors.grey,
-      ),
-      enabled: finished,
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              finished
-                  ? 'Thiết lập hoàn tất! Chuyển đến trang chủ...'
-                  : 'Vui lòng hoàn tất thiết lập trước khi tiếp tục.',
-            ),
-          ),
+    finished &= ref
+        .watch(storagePermissionProvider)
+        .maybeWhen(
+          data: (status) => status.isGranted,
+          orElse: () => false,
         );
+
+    callback() {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            finished
+                ? 'Thiết lập hoàn tất! Chuyển đến trang chủ...'
+                : 'Vui lòng hoàn tất thiết lập trước khi tiếp tục.',
+          ),
+        ),
+      );
+    }
+
+    return FilledButton.icon(
+      label: const Text('Hoàn tất thiết lập'),
+      icon: Icon(Symbols.check_circle),
+      onPressed: finished ? callback : null,
+    );
+  }
+}
+
+class _StoragePermissionTile extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final storagePermissionAsync = ref.watch(storagePermissionProvider);
+    final granted = storagePermissionAsync.when(
+      data: (status) => status.isGranted,
+      loading: () => false,
+      error: (e, st) => false,
+    );
+
+    return ListTile(
+      title: const Text('Quyền truy cập bộ nhớ'),
+      subtitle: Text(granted ? 'Đã cấp quyền' : 'Chưa cấp quyền'),
+      trailing: Icon(
+        granted ? Symbols.check_circle : Symbols.error,
+        color: granted ? Colors.green : Colors.red,
+      ),
+      onTap: () {
+        ref.read(storagePermissionProvider.notifier).request();
       },
     );
   }

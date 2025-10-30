@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:riverpod/riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 final appStoragePathProvider = AsyncNotifierProvider(
   () => StringPreferenceNotifier('app_storage_path'),
@@ -13,6 +14,10 @@ final appDatabasePathProvider = AsyncNotifierProvider(
 
 final useDarkModeProvider = AsyncNotifierProvider(
   () => BoolPreferenceNotifier('use_dark_mode', false),
+);
+
+final storagePermissionProvider = AsyncNotifierProvider(
+  () => StoragePermissionNotifier(),
 );
 
 sealed class PreferenceNotifier<T> extends AsyncNotifier<T?> {
@@ -61,5 +66,30 @@ class StringPreferenceNotifier extends PreferenceNotifier<String> {
   @override
   void setValue(SharedPreferences prefs, String value) {
     prefs.setString(name, value);
+  }
+}
+
+class StoragePermissionNotifier extends AsyncNotifier<PermissionStatus> {
+  StoragePermissionNotifier();
+
+  @override
+  FutureOr<PermissionStatus> build() async {
+    final statusStorage = await Permission.storage.status;
+    if (statusStorage.isGranted) {
+      return statusStorage;
+    }
+    final status = await Permission.manageExternalStorage.status;
+    return status;
+  }
+
+  Future<void> request() async {
+    final statusStorage = await Permission.storage.request();
+    if (statusStorage.isGranted) {
+      ref.invalidateSelf();
+      return;
+    }
+
+    await Permission.manageExternalStorage.request();
+    ref.invalidateSelf();
   }
 }
