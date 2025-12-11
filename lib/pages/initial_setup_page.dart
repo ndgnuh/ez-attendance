@@ -11,7 +11,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../database/database.dart';
-import '../providers/local_preferences.dart';
+import '../providers.dart';
 
 class InitialSetupPage extends StatelessWidget {
   const InitialSetupPage({super.key});
@@ -20,7 +20,7 @@ class InitialSetupPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Initial Setup'),
+        title: const Text('Trang cài đặt'),
         automaticallyImplyLeading: false,
       ),
       body: Center(
@@ -230,12 +230,17 @@ class _FinishSetupButton extends ConsumerWidget {
         );
 
     callback() {
-      ScaffoldMessenger.of(context).showSnackBar(
+      if (finished) {
+        final navigator = Navigator.of(context);
+        navigator.pushReplacementNamed('/');
+        return;
+      }
+
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.showSnackBar(
         SnackBar(
           content: Text(
-            finished
-                ? 'Thiết lập hoàn tất! Chuyển đến trang chủ...'
-                : 'Vui lòng hoàn tất thiết lập trước khi tiếp tục.',
+            'Vui lòng hoàn tất thiết lập trước khi tiếp tục.',
           ),
         ),
       );

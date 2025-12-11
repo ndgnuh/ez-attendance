@@ -11,6 +11,8 @@ MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
 
   Widget builder(BuildContext context) {
     return switch (name) {
+      CourseClassListPage.routeName => const CourseClassListPage(),
+      CourseClassCreatePage.routeName => const CourseClassCreatePage(),
       RouteNames.initialSetupPage => const InitialSetupPage(),
       _ => const NotFoundPage(),
     };

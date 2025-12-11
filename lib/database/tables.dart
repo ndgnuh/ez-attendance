@@ -1,4 +1,33 @@
 import 'package:drift/drift.dart';
+import 'id_types.dart';
+
+class IdConverter<T, T2> extends TypeConverter<T, T2> {
+  @override
+  T fromSql(T2 fromDb) => fromDb as T;
+
+  @override
+  T2 toSql(T value) => value as T2;
+}
+
+class AttendanceConverter extends TypeConverter<AttendanceStatus, String> {
+  const AttendanceConverter();
+
+  @override
+  AttendanceStatus fromSql(String fromDb) {
+    return AttendanceStatus.values.firstWhere(
+      (e) => e.value == fromDb,
+      orElse: () => AttendanceStatus.unknown,
+    );
+  }
+
+  @override
+  String toSql(AttendanceStatus status) => status.value;
+}
+
+final semesterIdConverter = IdConverter<SemesterId, int>();
+final sessionIdConverter = IdConverter<SessionId, int>();
+final courseClassIdConverter = IdConverter<CourseClassId, int>();
+final studentIdConverter = IdConverter<StudentId, String>();
 
 const tables = [
   Course,
@@ -15,24 +44,13 @@ class Attendance extends Table {
   IntColumn get numContributions => integer().withDefault(const Constant(0))();
   @override
   Set<Column> get primaryKey => {sessionId, studentId};
-  IntColumn get sessionId => integer().references(Session, #id)();
+  IntColumn get sessionId =>
+      integer().references(Session, #id, onUpdate: KeyAction.cascade)();
 
-  TextColumn get studentId => text().references(Student, #id)();
-}
-
-class AttendanceConverter extends TypeConverter<AttendanceStatus, String> {
-  const AttendanceConverter();
-
-  @override
-  AttendanceStatus fromSql(String fromDb) {
-    return AttendanceStatus.values.firstWhere(
-      (e) => e.value == fromDb,
-      orElse: () => AttendanceStatus.unknown,
-    );
-  }
-
-  @override
-  String toSql(AttendanceStatus status) => status.value;
+  TextColumn get studentId =>
+      text()
+          .map(studentIdConverter)
+          .references(Student, #id, onUpdate: KeyAction.cascade)();
 }
 
 enum AttendanceStatus {
@@ -56,39 +74,52 @@ class Course extends Table {
 }
 
 class CourseClass extends Table {
-  TextColumn get code => text()();
-  TextColumn get courseId => text().references(Course, #id)();
-  IntColumn get dayOfWeek => integer()();
-  IntColumn get fromPeriod => integer()();
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get location => text()();
+  TextColumn get classCode => text()();
+  IntColumn get dayOfWeek => integer().nullable()();
+  IntColumn get fromPeriod => integer().nullable()();
+  IntColumn get toPeriod => integer().nullable()();
+  TextColumn get location => text().nullable()();
 
-  IntColumn get semesterId => integer().references(Semester, #id)();
-  IntColumn get toPeriod => integer()();
+  TextColumn get courseId =>
+      text().references(Course, #id, onUpdate: KeyAction.cascade)();
+  IntColumn get semesterId =>
+      integer()
+          .map(semesterIdConverter)
+          .references(Semester, #id, onUpdate: KeyAction.cascade)();
 }
 
 class Registration extends Table {
-  IntColumn get courseClassId => integer().references(CourseClass, #id)();
+  IntColumn get courseClassId =>
+      integer()
+          .map(courseClassIdConverter)
+          .references(CourseClass, #id, onUpdate: KeyAction.cascade)();
+  TextColumn get studentId =>
+      text()
+          .map(studentIdConverter)
+          .references(Student, #id, onUpdate: KeyAction.cascade)();
+
   @override
   Set<Column> get primaryKey => {courseClassId, studentId};
-
-  TextColumn get studentId => text().references(Student, #id)();
 }
 
 class Semester extends Table {
-  IntColumn get id => integer().autoIncrement()();
+  IntColumn get id => integer().autoIncrement().map(semesterIdConverter)();
   TextColumn get name => text()();
 }
 
 class Session extends Table {
-  IntColumn get courseClassId => integer().references(CourseClass, #id)();
+  IntColumn get id => integer().autoIncrement().map(sessionIdConverter)();
+  IntColumn get courseClassId =>
+      integer()
+          .map(courseClassIdConverter)
+          .references(CourseClass, #id, onUpdate: KeyAction.cascade)();
   DateTimeColumn get date => dateTime()();
-  IntColumn get id => integer().autoIncrement()();
 }
 
 class Student extends Table {
+  TextColumn get id => text().map(studentIdConverter)();
   TextColumn get email => text()();
-  TextColumn get id => text()();
   TextColumn get name => text()();
 
   @override

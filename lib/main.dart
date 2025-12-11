@@ -41,7 +41,7 @@ class MyApp extends ConsumerWidget {
     return MaterialApp(
       title: 'Attendance Tool',
       theme: theme,
-      initialRoute: RouteNames.initialSetupPage,
+      initialRoute: RouteNames.home,
       onGenerateRoute: onGenerateRoute,
     );
   }

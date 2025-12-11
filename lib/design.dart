@@ -16,11 +16,13 @@ class ConstrainedAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: maxWidth,
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: maxWidth,
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 
@@ -29,4 +31,27 @@ class ConstrainedAppBar extends StatelessWidget implements PreferredSizeWidget {
     false => Size.fromHeight(kToolbarHeight),
     true => Size.fromHeight(kToolbarHeight + kTextTabBarHeight),
   };
+}
+
+class ConstrainedBody extends StatelessWidget {
+  final Widget child;
+  final double maxWidth;
+
+  const ConstrainedBody({
+    super.key,
+    required this.child,
+    this.maxWidth = 960,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: maxWidth,
+        ),
+        child: child,
+      ),
+    );
+  }
 }

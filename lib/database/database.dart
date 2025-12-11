@@ -7,7 +7,10 @@ import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'id_types.dart';
 import 'tables.dart';
+
+export 'id_types.dart';
 
 part 'database.g.dart';
 
@@ -53,5 +56,43 @@ class AppDatabase extends _$AppDatabase {
     final file = File('db.sqlite');
     final db = NativeDatabase(file);
     return db;
+  }
+
+  SimpleSelectStatement<Course, CourseData> searchCourse({
+    String? id,
+    String? searchText,
+  }) {
+    final stmt = select(course);
+
+    switch (id) {
+      case String courseId when courseId.trim().isNotEmpty:
+        stmt.where((c) => c.id.equals(courseId));
+    }
+
+    switch (searchText) {
+      case String text when text.trim().isNotEmpty:
+        stmt.where((c) => c.name.contains(text) | c.id.contains(text));
+    }
+
+    return stmt;
+  }
+
+  SimpleSelectStatement<Semester, SemesterData> searchSemester({
+    SemesterId? id,
+    String? searchText,
+  }) {
+    final stmt = select(semester);
+
+    switch (id) {
+      case SemesterId semesterId:
+        stmt.where((s) => s.id.equals(semesterId.id));
+    }
+
+    switch (searchText) {
+      case String text when text.trim().isNotEmpty:
+        stmt.where((s) => s.name.contains(text));
+    }
+
+    return stmt;
   }
 }

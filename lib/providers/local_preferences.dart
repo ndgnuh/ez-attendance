@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:riverpod/riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -74,6 +75,9 @@ class StoragePermissionNotifier extends AsyncNotifier<PermissionStatus> {
 
   @override
   FutureOr<PermissionStatus> build() async {
+    if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+      return PermissionStatus.granted;
+    }
     final statusStorage = await Permission.storage.status;
     if (statusStorage.isGranted) {
       return statusStorage;
