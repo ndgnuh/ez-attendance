@@ -1,28 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'initial_setup_page.dart';
-import 'course_classes/index.dart';
 import 'routes.dart';
 
 export 'routes.dart';
 
-MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
-  final name = settings.name;
-
-  Widget builder(BuildContext context) {
-    return switch (name) {
-      CourseClassListPage.routeName => const CourseClassListPage(),
-      CourseClassCreatePage.routeName => const CourseClassCreatePage(),
-      RouteNames.initialSetupPage => const InitialSetupPage(),
-      _ => const NotFoundPage(),
-    };
-  }
-
-  return MaterialPageRoute(
-    builder: builder,
-    settings: settings,
-  );
-}
+final initialRoute = switch (kReleaseMode) {
+  true => RouteNames.initialSetupPage,
+  false => "/",
+};
 
 class NotFoundPage extends StatelessWidget {
   const NotFoundPage({super.key});

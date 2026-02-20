@@ -1,9 +1,9 @@
 import 'package:riverpod/riverpod.dart';
-import 'database/database.dart';
-import 'providers.dart';
+import 'core/database/database.dart';
+import 'shared/providers.dart';
 
 final courseClassViewModelProvider = FutureProvider.family(
-  (ref, CourseClassId id) async {
+  (ref, int id) async {
     final courseClass = await ref.watch(
       courseClassProvider(id).future,
     );

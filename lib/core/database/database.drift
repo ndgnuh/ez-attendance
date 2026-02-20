@@ -1,0 +1,36 @@
+-- create table course (
+--     id text not null primary key,
+--     name text not null,
+-- );
+--
+-- create table course_class (
+--     id text not null primary key,
+--     course_id text not null,
+--     day_of_week integer not null,
+--     from_period integer not null,
+--     to_period integer not null,
+--     semester text not null,
+--     name text not null
+-- );
+--
+-- create table course_class_student (
+--     class_id text not null,
+--     student_id text not null,
+--     primary key (course_class_id, student_id),
+--     foreign key (course_class_id) references course_class(id) on delete cascade,
+--     foreign key (student_id) references student(id) on delete cascade
+-- );
+--
+-- create table checkin (
+--     id int not null auto increment primary key,
+--     class_id text not null,
+--     student_id text not null,
+--     date datetime not null,
+--     is_present boolean not null default false,
+--     foreign key (course_class_id) references course_class(id) on delete cascade,
+--     foreign key (student_id) references student(id) on delete cascade
+-- );
+--
+-- get_semesters: select distinct semester from course_class order by semester;
+
+-- vim: ft=sql

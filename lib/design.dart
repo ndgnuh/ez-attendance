@@ -55,3 +55,37 @@ class ConstrainedBody extends StatelessWidget {
     );
   }
 }
+
+class CardSection extends StatelessWidget {
+  const CardSection({
+    super.key,
+    required this.title,
+    required this.children,
+  });
+
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(title: Text(title)),
+        Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.gutterTiny),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: ListView.separated(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) => children[index],
+            itemCount: children.length,
+            separatorBuilder: (context, index) => Divider(),
+          ),
+        ),
+      ],
+    );
+  }
+}

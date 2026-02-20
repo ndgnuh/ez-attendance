@@ -1,11 +1,15 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
-import 'pages/pages.dart';
-import 'providers/local_preferences.dart';
+import 'core/router.dart';
+import 'shared/providers/local_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Intl.defaultLocale = 'vi_VN';
 
   // File("./db.sqlite").deleteSync();
 
@@ -20,7 +24,14 @@ void main() async {
   //   CourseCompanion.insert(id: 'MI1111E', name: 'Giải tích I'),
   // ]);
   // print(s);
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(
+    ProviderScope(
+      retry: (int times, exc) {
+        return null;
+      },
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {
@@ -36,13 +47,62 @@ class MyApp extends ConsumerWidget {
       error: (e, st) => false,
     );
 
-    final theme = darkMode ? ThemeData.dark() : ThemeData.light();
+    final buttonShape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.zero,
+    );
+    ThemeData theme = darkMode ? ThemeData.dark() : ThemeData.light();
+    theme = theme.copyWith(
+      // remove all the rounded corners
+      cardTheme: theme.cardTheme.copyWith(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      ),
+      dialogTheme: theme.dialogTheme.copyWith(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      ),
+      buttonTheme: theme.buttonTheme.copyWith(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          shape: buttonShape,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          shape: buttonShape,
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          shape: buttonShape,
+        ),
+      ),
+    );
+
+    final subThemesData = FlexSubThemesData(
+      blendOnColors: true,
+      inputDecoratorIsFilled: true,
+      alignedDropdown: true,
+      defaultRadius: context.gutterTiny,
+    );
+
+    final scheme = FlexScheme.redWine;
 
     return MaterialApp(
       title: 'Attendance Tool',
-      theme: theme,
-      initialRoute: RouteNames.home,
-      onGenerateRoute: onGenerateRoute,
+      darkTheme: FlexThemeData.dark(
+        scheme: scheme,
+        subThemesData: subThemesData,
+        keyColors: const FlexKeyColors(),
+      ),
+      theme: FlexThemeData.light(
+        scheme: scheme,
+        subThemesData: subThemesData,
+        keyColors: const FlexKeyColors(),
+      ),
+      home: AppRouter(context).homePage(),
+      // initialRoute: initialRoute,
+      // onGenerateRoute: onGenerateRoute,
     );
   }
 }
