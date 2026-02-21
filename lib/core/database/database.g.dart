@@ -26,8 +26,23 @@ class $CourseTable extends Course with TableInfo<$CourseTable, CourseData> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _searchKeyMeta = const VerificationMeta(
+    'searchKey',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, name];
+  late final GeneratedColumn<String> searchKey = GeneratedColumn<String>(
+    'search_key',
+    aliasedName,
+    false,
+    generatedAs: GeneratedAs(
+      FunctionCallExpression("createSearchKey", [name, id]),
+      false,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, searchKey];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -53,6 +68,12 @@ class $CourseTable extends Course with TableInfo<$CourseTable, CourseData> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('search_key')) {
+      context.handle(
+        _searchKeyMeta,
+        searchKey.isAcceptableOrUnknown(data['search_key']!, _searchKeyMeta),
+      );
+    }
     return context;
   }
 
@@ -72,6 +93,11 @@ class $CourseTable extends Course with TableInfo<$CourseTable, CourseData> {
             DriftSqlType.string,
             data['${effectivePrefix}name'],
           )!,
+      searchKey:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}search_key'],
+          )!,
     );
   }
 
@@ -84,7 +110,14 @@ class $CourseTable extends Course with TableInfo<$CourseTable, CourseData> {
 class CourseData extends DataClass implements Insertable<CourseData> {
   final String id;
   final String name;
-  const CourseData({required this.id, required this.name});
+
+  /// generated search key
+  final String searchKey;
+  const CourseData({
+    required this.id,
+    required this.name,
+    required this.searchKey,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -105,6 +138,7 @@ class CourseData extends DataClass implements Insertable<CourseData> {
     return CourseData(
       id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      searchKey: serializer.fromJson<String>(json['searchKey']),
     );
   }
   @override
@@ -113,33 +147,35 @@ class CourseData extends DataClass implements Insertable<CourseData> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
+      'searchKey': serializer.toJson<String>(searchKey),
     };
   }
 
-  CourseData copyWith({String? id, String? name}) =>
-      CourseData(id: id ?? this.id, name: name ?? this.name);
-  CourseData copyWithCompanion(CourseCompanion data) {
-    return CourseData(
-      id: data.id.present ? data.id.value : this.id,
-      name: data.name.present ? data.name.value : this.name,
-    );
-  }
-
+  CourseData copyWith({String? id, String? name, String? searchKey}) =>
+      CourseData(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        searchKey: searchKey ?? this.searchKey,
+      );
   @override
   String toString() {
     return (StringBuffer('CourseData(')
           ..write('id: $id, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('searchKey: $searchKey')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name);
+  int get hashCode => Object.hash(id, name, searchKey);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is CourseData && other.id == this.id && other.name == this.name);
+      (other is CourseData &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.searchKey == this.searchKey);
 }
 
 class CourseCompanion extends UpdateCompanion<CourseData> {
@@ -1210,8 +1246,38 @@ class $StudentTable extends Student with TableInfo<$StudentTable, StudentData> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _firstNameMeta = const VerificationMeta(
+    'firstName',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, email, name];
+  late final GeneratedColumn<String> firstName = GeneratedColumn<String>(
+    'first_name',
+    aliasedName,
+    false,
+    generatedAs: GeneratedAs(
+      FunctionCallExpression("getFirstName", [name]),
+      false,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _searchKeyMeta = const VerificationMeta(
+    'searchKey',
+  );
+  @override
+  late final GeneratedColumn<String> searchKey = GeneratedColumn<String>(
+    'search_key',
+    aliasedName,
+    false,
+    generatedAs: GeneratedAs(
+      FunctionCallExpression("createSearchKey", [name, id]),
+      false,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, email, name, firstName, searchKey];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1245,6 +1311,18 @@ class $StudentTable extends Student with TableInfo<$StudentTable, StudentData> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('first_name')) {
+      context.handle(
+        _firstNameMeta,
+        firstName.isAcceptableOrUnknown(data['first_name']!, _firstNameMeta),
+      );
+    }
+    if (data.containsKey('search_key')) {
+      context.handle(
+        _searchKeyMeta,
+        searchKey.isAcceptableOrUnknown(data['search_key']!, _searchKeyMeta),
+      );
+    }
     return context;
   }
 
@@ -1269,6 +1347,16 @@ class $StudentTable extends Student with TableInfo<$StudentTable, StudentData> {
             DriftSqlType.string,
             data['${effectivePrefix}name'],
           )!,
+      firstName:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}first_name'],
+          )!,
+      searchKey:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}search_key'],
+          )!,
     );
   }
 
@@ -1282,10 +1370,14 @@ class StudentData extends DataClass implements Insertable<StudentData> {
   final String id;
   final String email;
   final String name;
+  final String firstName;
+  final String searchKey;
   const StudentData({
     required this.id,
     required this.email,
     required this.name,
+    required this.firstName,
+    required this.searchKey,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1313,6 +1405,8 @@ class StudentData extends DataClass implements Insertable<StudentData> {
       id: serializer.fromJson<String>(json['id']),
       email: serializer.fromJson<String>(json['email']),
       name: serializer.fromJson<String>(json['name']),
+      firstName: serializer.fromJson<String>(json['firstName']),
+      searchKey: serializer.fromJson<String>(json['searchKey']),
     );
   }
   @override
@@ -1322,42 +1416,47 @@ class StudentData extends DataClass implements Insertable<StudentData> {
       'id': serializer.toJson<String>(id),
       'email': serializer.toJson<String>(email),
       'name': serializer.toJson<String>(name),
+      'firstName': serializer.toJson<String>(firstName),
+      'searchKey': serializer.toJson<String>(searchKey),
     };
   }
 
-  StudentData copyWith({String? id, String? email, String? name}) =>
-      StudentData(
-        id: id ?? this.id,
-        email: email ?? this.email,
-        name: name ?? this.name,
-      );
-  StudentData copyWithCompanion(StudentCompanion data) {
-    return StudentData(
-      id: data.id.present ? data.id.value : this.id,
-      email: data.email.present ? data.email.value : this.email,
-      name: data.name.present ? data.name.value : this.name,
-    );
-  }
-
+  StudentData copyWith({
+    String? id,
+    String? email,
+    String? name,
+    String? firstName,
+    String? searchKey,
+  }) => StudentData(
+    id: id ?? this.id,
+    email: email ?? this.email,
+    name: name ?? this.name,
+    firstName: firstName ?? this.firstName,
+    searchKey: searchKey ?? this.searchKey,
+  );
   @override
   String toString() {
     return (StringBuffer('StudentData(')
           ..write('id: $id, ')
           ..write('email: $email, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('firstName: $firstName, ')
+          ..write('searchKey: $searchKey')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, email, name);
+  int get hashCode => Object.hash(id, email, name, firstName, searchKey);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is StudentData &&
           other.id == this.id &&
           other.email == this.email &&
-          other.name == this.name);
+          other.name == this.name &&
+          other.firstName == this.firstName &&
+          other.searchKey == this.searchKey);
 }
 
 class StudentCompanion extends UpdateCompanion<StudentData> {
@@ -1477,7 +1576,7 @@ class $AttendanceTable extends Attendance
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES session (id) ON UPDATE CASCADE',
+      'REFERENCES session (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _studentIdMeta = const VerificationMeta(
@@ -1491,7 +1590,7 @@ class $AttendanceTable extends Attendance
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES student (id) ON UPDATE CASCADE',
+      'REFERENCES student (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   @override
@@ -2066,9 +2165,23 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'session',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('attendance', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'session',
         limitUpdateKind: UpdateKind.update,
       ),
       result: [TableUpdate('attendance', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'student',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('attendance', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
@@ -2149,6 +2262,11 @@ class $$CourseTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get searchKey => $composableBuilder(
+    column: $table.searchKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> courseClassRefs(
     Expression<bool> Function($$CourseClassTableFilterComposer f) f,
   ) {
@@ -2193,6 +2311,11 @@ class $$CourseTableOrderingComposer
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get searchKey => $composableBuilder(
+    column: $table.searchKey,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CourseTableAnnotationComposer
@@ -2209,6 +2332,9 @@ class $$CourseTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get searchKey =>
+      $composableBuilder(column: $table.searchKey, builder: (column) => column);
 
   Expression<T> courseClassRefs<T extends Object>(
     Expression<T> Function($$CourseClassTableAnnotationComposer a) f,
@@ -3683,6 +3809,16 @@ class $$StudentTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get firstName => $composableBuilder(
+    column: $table.firstName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get searchKey => $composableBuilder(
+    column: $table.searchKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> attendanceRefs(
     Expression<bool> Function($$AttendanceTableFilterComposer f) f,
   ) {
@@ -3757,6 +3893,16 @@ class $$StudentTableOrderingComposer
     column: $table.name,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get firstName => $composableBuilder(
+    column: $table.firstName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get searchKey => $composableBuilder(
+    column: $table.searchKey,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$StudentTableAnnotationComposer
@@ -3776,6 +3922,12 @@ class $$StudentTableAnnotationComposer
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get firstName =>
+      $composableBuilder(column: $table.firstName, builder: (column) => column);
+
+  GeneratedColumn<String> get searchKey =>
+      $composableBuilder(column: $table.searchKey, builder: (column) => column);
 
   Expression<T> attendanceRefs<T extends Object>(
     Expression<T> Function($$AttendanceTableAnnotationComposer a) f,

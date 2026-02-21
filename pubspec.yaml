@@ -22,6 +22,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # Database ORM & other data
   drift: ^2.28.0
@@ -55,6 +57,7 @@ dependencies:
   mobile_scanner: ^7.2.0
   flutter_typeahead: ^5.2.0
   flex_color_scheme: ^8.4.0
+  sqlite3: ^2.9.4
 
 dev_dependencies:
   flutter_test:

@@ -2,11 +2,12 @@ library;
 
 import 'dart:io';
 
+import 'package:diacritic/diacritic.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-
+import 'package:sqlite3/sqlite3.dart' show AllowedArgumentCount;
 import 'tables.dart';
 
 export './classes_dao.dart';
@@ -47,6 +48,40 @@ class AppDatabase extends _$AppDatabase {
       name: 'attendance_database',
       native: DriftNativeOptions(
         databasePath: () => Future.value(path),
+        setup: (common) {
+          /// This function is used to sort by name
+          common.createFunction(
+            functionName: "getFirstName",
+            argumentCount: const AllowedArgumentCount(1),
+            deterministic: true,
+            directOnly: false,
+            function: (args) {
+              final input = args[0] as String?;
+              if (input == null || input.isEmpty) return null;
+              final name = removeDiacritics(input);
+              return name.trim().split(' ').last;
+            },
+          );
+
+          /// Create search key by remove the diacritic
+          /// of the first arguments, and then combine other informations
+          common.createFunction(
+            functionName: "createSearchKey",
+            deterministic: true,
+            directOnly: false,
+            function: (args) {
+              final parts = <String>[];
+              final name = (args[0] as String);
+              final dname = removeDiacritics(name);
+              parts.add(name);
+              parts.add(dname);
+              for (final arg in args.skip(1)) {
+                parts.add(arg as String);
+              }
+              return parts.map((p) => "($p)").join();
+            },
+          );
+        },
       ),
     );
     return AppDatabase(executor);

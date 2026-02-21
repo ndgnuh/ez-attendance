@@ -1,11 +1,16 @@
+import 'package:checkin_tool/core/database/tables.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../features/app_screens/presentation.dart';
+import '../features/attendance_session/presentation.dart';
 import '../features/class_registration/course_class_students/page.dart';
 import '../features/course_class_import/import_page.dart';
 import '../features/course_class_management/presentation.dart';
 import '../features/settings/initial_setup_page.dart';
 import '../features/settings/middleware_page.dart';
+import 'database/database.dart';
 
 class AppRouter {
   final BuildContext context;
@@ -16,20 +21,35 @@ class AppRouter {
   ProviderContainer get ref => ProviderScope.containerOf(context);
 
   Widget homePage() {
-    // if (kDebugMode) {
-    //   return CourseClassImportPage();
-    // }
+    if (kDebugMode) {
+      // return AttendanceSessionCreatePage(courseClassId: 3);
+    }
     return MiddlewarePage();
   }
 
-  Future<void> simpleTo(Widget page, {bool replace = false}) {
-    final route = MaterialPageRoute(builder: (context) => page);
+  Future simpleTo<T>(Widget page, {bool replace = false}) {
+    final route = MaterialPageRoute<T>(builder: (context) => page);
     if (replace) {
       return navigator.pushReplacement(route);
     } else {
-      return navigator.push(route);
+      return navigator.push<T>(route);
     }
   }
+
+  Future<StudentCompanion?> toAddStudentPage({String? studentId}) {
+    final route = MaterialPageRoute<StudentCompanion>(
+      builder: (context) => AddStudentPage(studentId: studentId),
+    );
+    return navigator.push<StudentCompanion>(route);
+  }
+
+  Future toAttendanceSessionListPage(int courseClassId) => simpleTo(
+    AttendanceSessionListPage(courseClassId: courseClassId),
+  );
+
+  Future toAttendanceSessionStudentListPage(int sessionId) => simpleTo(
+    AttendanceListPage(sessionId: sessionId),
+  );
 
   Future toCourseClassCreatePage() => simpleTo(CourseClassCreatePage());
 

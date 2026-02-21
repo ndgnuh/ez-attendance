@@ -67,6 +67,8 @@ class _GeneralInfoTab extends ConsumerWidget {
     final semester = model?.semester;
     final courseClass = model?.courseClass;
 
+    final router = AppRouter(context);
+
     final generalInfo = [
       ListTile(
         title: Text("Học phần"),
@@ -80,7 +82,13 @@ class _GeneralInfoTab extends ConsumerWidget {
         title: Text("Danh sách lớp"),
         subtitle: Text("Tới trang danh sách lớp"),
         trailing: Icon(Symbols.chevron_forward),
-        onTap: () => context.router.toCourseClassStudentList(id),
+        onTap: () => router.toCourseClassStudentList(id),
+      ),
+      ListTile(
+        title: Text("Điểm danh"),
+        subtitle: Text("Danh sách buổi điểm danh"),
+        trailing: Icon(Symbols.chevron_forward),
+        onTap: () => router.toAttendanceSessionListPage(id),
       ),
     ];
 

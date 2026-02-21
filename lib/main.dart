@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'core/router.dart';
 import 'shared/providers/local_preferences.dart';
+import './shared/context.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -90,6 +92,17 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       title: 'Attendance Tool',
+      navigatorKey: navigationKey,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('vi'), // French
+      ],
+      locale: const Locale("vi"),
       darkTheme: FlexThemeData.dark(
         scheme: scheme,
         subThemesData: subThemesData,
@@ -101,6 +114,10 @@ class MyApp extends ConsumerWidget {
         keyColors: const FlexKeyColors(),
       ),
       home: AppRouter(context).homePage(),
+      builder:
+          (context, child) => SafeArea(
+            child: child ?? SizedBox.shrink(),
+          ),
       // initialRoute: initialRoute,
       // onGenerateRoute: onGenerateRoute,
     );

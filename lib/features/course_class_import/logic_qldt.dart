@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:excel/excel.dart';
 
+import '../../shared/utilities.dart';
 import 'data_model.dart';
 
 const _columns = (
@@ -13,16 +14,6 @@ const _columns = (
   studentName: "Họ và tên SV",
   studentEmail: "Email",
 );
-
-/// Convert something like "JOHN SMITH" to "John Smith"
-String titlecase(String name) {
-  return name
-      .split(' ')
-      .map(
-        (word) => "${word[0].toUpperCase()}${word.substring(1).toLowerCase()}",
-      )
-      .join(' ');
-}
 
 ImportData importFromQldt({required Uint8List bytes}) {
   final excel = Excel.decodeBytes(bytes);

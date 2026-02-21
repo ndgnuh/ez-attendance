@@ -38,4 +38,12 @@ class PreferenceService {
     final dm = await getDarkMode();
     setDarkMode(!dm);
   }
+
+  Future<bool> getDefaultScanMode() async {
+    return (await prefs).getBool('scan_mode_by_default') ?? false;
+  }
+
+  Future<bool> setDefaultScanMode(bool value) async {
+    return (await prefs).setBool('scan_mode_by_default', value);
+  }
 }

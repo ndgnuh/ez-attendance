@@ -28,13 +28,25 @@ const tables = [
 class Attendance extends Table {
   TextColumn get attendanceStatus => text().map(const AttendanceConverter())();
   IntColumn get numContributions => integer().withDefault(const Constant(0))();
+
   @override
   Set<Column> get primaryKey => {sessionId, studentId};
+
   IntColumn get sessionId =>
-      integer().references(Session, #id, onUpdate: KeyAction.cascade)();
+      integer().references(
+        Session,
+        #id,
+        onUpdate: KeyAction.cascade,
+        onDelete: KeyAction.cascade,
+      )();
 
   TextColumn get studentId =>
-      text().references(Student, #id, onUpdate: KeyAction.cascade)();
+      text().references(
+        Student,
+        #id,
+        onUpdate: KeyAction.cascade,
+        onDelete: KeyAction.cascade,
+      )();
 }
 
 enum AttendanceStatus {
@@ -52,6 +64,12 @@ enum AttendanceStatus {
 class Course extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
+
+  /// generated search key
+  TextColumn get searchKey =>
+      text().generatedAs(
+        FunctionCallExpression("createSearchKey", [name, id]),
+      )();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -97,6 +115,18 @@ class Student extends Table {
   TextColumn get id => text()();
   TextColumn get email => text()();
   TextColumn get name => text()();
+
+  // Generated columns
+  TextColumn get firstName =>
+      text().generatedAs(
+        FunctionCallExpression("getFirstName", [name]),
+        stored: false,
+      )();
+  TextColumn get searchKey =>
+      text().generatedAs(
+        FunctionCallExpression("createSearchKey", [name, id]),
+        stored: false,
+      )();
 
   @override
   Set<Column> get primaryKey => {id};
