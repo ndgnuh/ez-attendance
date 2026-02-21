@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
 
+import '../enums.dart';
+
 class AttendanceConverter extends TypeConverter<AttendanceStatus, String> {
   const AttendanceConverter();
 
@@ -49,18 +51,6 @@ class Attendance extends Table {
       )();
 }
 
-enum AttendanceStatus {
-  unknown('00-unknown', 'Unknown'),
-  present('01-present', 'Present'),
-  absent('02-absent', 'Absent'),
-  late('03-late', 'Late'),
-  excused('04-excused', 'Excused');
-
-  final String value;
-  final String label;
-  const AttendanceStatus(this.value, this.label);
-}
-
 class Course extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
@@ -69,6 +59,7 @@ class Course extends Table {
   TextColumn get searchKey =>
       text().generatedAs(
         FunctionCallExpression("createSearchKey", [name, id]),
+        stored: true,
       )();
 
   @override
@@ -84,16 +75,36 @@ class CourseClass extends Table {
   TextColumn get location => text().nullable()();
 
   TextColumn get courseId =>
-      text().references(Course, #id, onUpdate: KeyAction.cascade)();
+      text().references(
+        Course,
+        #id,
+        onUpdate: KeyAction.cascade,
+        onDelete: KeyAction.restrict,
+      )();
   IntColumn get semesterId =>
-      integer().references(Semester, #id, onUpdate: KeyAction.cascade)();
+      integer().references(
+        Semester,
+        #id,
+        onUpdate: KeyAction.cascade,
+        onDelete: KeyAction.restrict,
+      )();
 }
 
 class Registration extends Table {
   IntColumn get courseClassId =>
-      integer().references(CourseClass, #id, onUpdate: KeyAction.cascade)();
+      integer().references(
+        CourseClass,
+        #id,
+        onUpdate: KeyAction.cascade,
+        onDelete: KeyAction.cascade,
+      )();
   TextColumn get studentId =>
-      text().references(Student, #id, onUpdate: KeyAction.cascade)();
+      text().references(
+        Student,
+        #id,
+        onUpdate: KeyAction.cascade,
+        onDelete: KeyAction.cascade,
+      )();
 
   @override
   Set<Column> get primaryKey => {courseClassId, studentId};
@@ -107,7 +118,12 @@ class Semester extends Table {
 class Session extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get courseClassId =>
-      integer().references(CourseClass, #id, onUpdate: KeyAction.cascade)();
+      integer().references(
+        CourseClass,
+        #id,
+        onUpdate: KeyAction.cascade,
+        onDelete: KeyAction.cascade,
+      )();
   DateTimeColumn get date => dateTime()();
 }
 
@@ -120,12 +136,12 @@ class Student extends Table {
   TextColumn get firstName =>
       text().generatedAs(
         FunctionCallExpression("getFirstName", [name]),
-        stored: false,
+        stored: true,
       )();
   TextColumn get searchKey =>
       text().generatedAs(
         FunctionCallExpression("createSearchKey", [name, id]),
-        stored: false,
+        stored: true,
       )();
 
   @override

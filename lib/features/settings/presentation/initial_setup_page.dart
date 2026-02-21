@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -10,8 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../core/database/database.dart';
-import '../../shared/providers.dart';
+import '../../../core/database/database.dart';
+import '../../../shared/providers.dart';
 
 class InitialSetupPage extends StatelessWidget {
   const InitialSetupPage({super.key});

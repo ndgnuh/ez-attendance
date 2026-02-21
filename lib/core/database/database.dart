@@ -8,6 +8,8 @@ import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart' show AllowedArgumentCount;
+
+import './../enums.dart';
 import 'tables.dart';
 
 export './classes_dao.dart';
@@ -22,6 +24,25 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
+  SimpleSelectStatement<Course, CourseData> searchCourse({
+    String? id,
+    String? searchText,
+  }) {
+    final stmt = select(course);
+
+    switch (id) {
+      case String courseId when courseId.trim().isNotEmpty:
+        stmt.where((c) => c.id.equals(courseId));
+    }
+
+    switch (searchText) {
+      case String text when text.trim().isNotEmpty:
+        stmt.where((c) => c.name.contains(text) | c.id.contains(text));
+    }
+
+    return stmt;
+  }
+
   static Future<Uint8List> createTemporaryDatabase() async {
     Future<String> getDatabasePath() async {
       final directory = await getTemporaryDirectory();
@@ -31,7 +52,12 @@ class AppDatabase extends _$AppDatabase {
 
     final executor = driftDatabase(
       name: 'attendance_database',
-      native: DriftNativeOptions(databasePath: getDatabasePath),
+      native: DriftNativeOptions(
+        databasePath: getDatabasePath,
+        setup: (common) {
+          common.select("PRAGMA foreign_keys = ON;");
+        },
+      ),
     );
 
     final db = AppDatabase(executor);
@@ -91,24 +117,5 @@ class AppDatabase extends _$AppDatabase {
     final file = File('db.sqlite');
     final db = NativeDatabase(file);
     return db;
-  }
-
-  SimpleSelectStatement<Course, CourseData> searchCourse({
-    String? id,
-    String? searchText,
-  }) {
-    final stmt = select(course);
-
-    switch (id) {
-      case String courseId when courseId.trim().isNotEmpty:
-        stmt.where((c) => c.id.equals(courseId));
-    }
-
-    switch (searchText) {
-      case String text when text.trim().isNotEmpty:
-        stmt.where((c) => c.name.contains(text) | c.id.contains(text));
-    }
-
-    return stmt;
   }
 }

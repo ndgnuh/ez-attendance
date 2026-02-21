@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
-import '../../core/database/tables.dart';
 import '../../core/database_service.dart';
+import '../../core/enums.dart';
 
 enum ScanningMode {
   markAttend,
@@ -142,11 +142,18 @@ extension Dao on AppDatabase {
     status: status,
   );
 
-  /// Delete attendance session
+  /// Delete attendance session, delete all the attendance records
+  /// belong to the said session
   Future<void> deleteAttendanceSession(int sessionId) async {
-    final stmt = delete(session);
-    stmt.where((row) => row.id.equals(sessionId));
-    await stmt.go();
+    final stmts = [
+      delete(attendance)..where((row) => row.sessionId.equals(sessionId)),
+      delete(session)..where((row) => row.id.equals(sessionId)),
+    ];
+    await transaction(() async {
+      for (final stmt in stmts) {
+        await stmt.go();
+      }
+    });
   }
 
   /// Add student to an attendance session and a class

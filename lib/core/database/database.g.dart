@@ -36,7 +36,7 @@ class $CourseTable extends Course with TableInfo<$CourseTable, CourseData> {
     false,
     generatedAs: GeneratedAs(
       FunctionCallExpression("createSearchKey", [name, id]),
-      false,
+      true,
     ),
     type: DriftSqlType.string,
     requiredDuringInsert: false,
@@ -517,7 +517,7 @@ class $CourseClassTable extends CourseClass
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES course (id) ON UPDATE CASCADE',
+      'REFERENCES course (id) ON UPDATE CASCADE ON DELETE RESTRICT',
     ),
   );
   static const VerificationMeta _semesterIdMeta = const VerificationMeta(
@@ -531,7 +531,7 @@ class $CourseClassTable extends CourseClass
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES semester (id) ON UPDATE CASCADE',
+      'REFERENCES semester (id) ON UPDATE CASCADE ON DELETE RESTRICT',
     ),
   );
   @override
@@ -983,7 +983,7 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES course_class (id) ON UPDATE CASCADE',
+      'REFERENCES course_class (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
@@ -1256,7 +1256,7 @@ class $StudentTable extends Student with TableInfo<$StudentTable, StudentData> {
     false,
     generatedAs: GeneratedAs(
       FunctionCallExpression("getFirstName", [name]),
-      false,
+      true,
     ),
     type: DriftSqlType.string,
     requiredDuringInsert: false,
@@ -1271,7 +1271,7 @@ class $StudentTable extends Student with TableInfo<$StudentTable, StudentData> {
     false,
     generatedAs: GeneratedAs(
       FunctionCallExpression("createSearchKey", [name, id]),
-      false,
+      true,
     ),
     type: DriftSqlType.string,
     requiredDuringInsert: false,
@@ -1897,7 +1897,7 @@ class $RegistrationTable extends Registration
     type: DriftSqlType.int,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES course_class (id) ON UPDATE CASCADE',
+      'REFERENCES course_class (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _studentIdMeta = const VerificationMeta(
@@ -1911,7 +1911,7 @@ class $RegistrationTable extends Registration
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES student (id) ON UPDATE CASCADE',
+      'REFERENCES student (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   @override
@@ -2158,6 +2158,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'course_class',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('session', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'course_class',
         limitUpdateKind: UpdateKind.update,
       ),
       result: [TableUpdate('session', kind: UpdateKind.update)],
@@ -2193,9 +2200,23 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'course_class',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('registration', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'course_class',
         limitUpdateKind: UpdateKind.update,
       ),
       result: [TableUpdate('registration', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'student',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('registration', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(

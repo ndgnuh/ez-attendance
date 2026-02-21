@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:excel/excel.dart';
 
-import '../../shared/utilities.dart';
-import 'data_model.dart';
+import '../../../shared/utilities.dart';
+import 'models.dart';
 
 const _columns = (
   semester: "Học kỳ",

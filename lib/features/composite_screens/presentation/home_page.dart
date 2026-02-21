@@ -1,0 +1,66 @@
+import 'package:checkin_tool/design.dart';
+import 'package:checkin_tool/features/course_class_management/presentation/management_panel.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_gutter/flutter_gutter.dart';
+
+import '../../course_class_management/presentation/list_tab_view.dart';
+
+class HomePage extends StatelessWidget {
+  final tabs = const [
+    Tab(text: "Lớp học"),
+    Tab(text: "Cài đặt"),
+  ];
+
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: tabs.length,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Trang chính"),
+          bottom: TabBar(
+            tabs: tabs,
+            isScrollable: true,
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            CourseClassListTabView(),
+            _SettingsTab(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsTab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final messenger = ScaffoldMessenger.of(context);
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(context.gutter),
+      child: Column(
+        children: [
+          CourseClassManagementPanel(),
+          CardSection(
+            title: "Cài đặt",
+            children: [
+              ListTile(
+                title: Text("Cài đặt"),
+                subtitle: Text("Tới trang cài đặt"),
+                onTap: () {
+                  messenger.showSnackBar(
+                    SnackBar(content: Text("Chưa được phát triển")),
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

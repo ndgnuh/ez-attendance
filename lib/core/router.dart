@@ -1,15 +1,12 @@
-import 'package:checkin_tool/core/database/tables.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../features/app_screens/presentation.dart';
+import '../features/composite_screens/composite_screens.dart';
 import '../features/attendance_session/presentation.dart';
 import '../features/class_registration/course_class_students/page.dart';
-import '../features/course_class_import/import_page.dart';
-import '../features/course_class_management/presentation.dart';
-import '../features/settings/initial_setup_page.dart';
-import '../features/settings/middleware_page.dart';
+import '../features/course_class_management/course_class_management.dart';
+import '../features/settings/settings.dart';
 import 'database/database.dart';
 
 class AppRouter {
@@ -70,7 +67,7 @@ class AppRouter {
 
   Future toInitialSetupPage() => simpleTo(InitialSetupPage(), replace: true);
 
-  Future toRealHomePage() => simpleTo(CourseClassListPage(), replace: true);
+  Future toRealHomePage() => simpleTo(HomePage(), replace: true);
 }
 
 extension EzRouter on BuildContext {

@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:excel/excel.dart';
 
-import 'data_model.dart';
+import 'models.dart';
 
 const _columns = (
   studentId: 1,

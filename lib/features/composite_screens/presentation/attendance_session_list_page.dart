@@ -1,7 +1,8 @@
-import 'package:checkin_tool/features/attendance_session/session_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:material_symbols_icons/symbols.dart';
+
+import '../../attendance_session/session_listview.dart';
 
 class AttendanceSessionListPage extends StatelessWidget {
   final int courseClassId;

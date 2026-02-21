@@ -1,13 +1,13 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'core/router.dart';
-import 'shared/providers/local_preferences.dart';
+import './core/router.dart';
 import './shared/context.dart';
+import './shared/providers/local_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +26,7 @@ void main() async {
   //   CourseCompanion.insert(id: 'MI1111E', name: 'Giải tích I'),
   // ]);
   // print(s);
+
   runApp(
     ProviderScope(
       retry: (int times, exc) {
@@ -88,7 +89,7 @@ class MyApp extends ConsumerWidget {
       defaultRadius: context.gutterTiny,
     );
 
-    final scheme = FlexScheme.redWine;
+    final scheme = FlexScheme.deepBlue;
 
     return MaterialApp(
       title: 'Attendance Tool',

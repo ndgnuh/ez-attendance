@@ -1,8 +1,8 @@
 import 'package:diacritic/diacritic.dart';
 import 'package:drift/drift.dart';
 
+import '../enums.dart';
 import 'database.dart';
-import 'tables.dart';
 
 /// Infer management email from student name and student's id
 String _autoEmail({required String studentName, required studentId}) {

@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:math' as math;
 
-import 'package:checkin_tool/features/attendance_session/add_student_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
@@ -10,8 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-import '../../core/database/tables.dart';
 import '../../core/database_service.dart';
+import '../../core/enums.dart';
 import '../../core/router.dart';
 import '../../shared/dialogs.dart';
 import './data_model.dart';
@@ -58,6 +56,166 @@ Future<void> showAttendanceSessionCreationDialog({
     courseClassId: courseClassId,
     datetime: datetime,
   );
+}
+
+class AddStudentButton extends StatelessWidget {
+  final int sessionId;
+
+  const AddStudentButton({super.key, required this.sessionId});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () async {
+        final ref = ProviderScope.containerOf(context);
+
+        final companion = await context.router.toAddStudentPage();
+        if (companion == null) {
+          return;
+        }
+
+        final db = await ref.read(databaseProvider.future);
+        await db.addStudent(
+          sessionId: sessionId,
+          studentCompanion: companion,
+        );
+      },
+      icon: Icon(Symbols.add),
+    );
+  }
+}
+
+class AttendanceListPage extends ConsumerWidget {
+  final int sessionId;
+
+  const AttendanceListPage({
+    super.key,
+    required this.sessionId,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final scanMode = ref.watch(IsScanningNotifier.provider);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Điểm danh"),
+        actions: [
+          SessionDeleteButton(sessionId: sessionId),
+          AddStudentButton(sessionId: sessionId),
+        ],
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(context.gutter),
+        child: Column(
+          spacing: context.gutter,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: switch (scanMode) {
+                false => AttendanceSessionStudentListView(sessionId: sessionId),
+                true => AttendanceScanner(sessionId: sessionId),
+              },
+            ),
+            if (scanMode) ScanMessage(),
+            IntrinsicHeight(
+              child: Row(
+                spacing: context.gutter,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: switch (scanMode) {
+                      false => AttendanceSearchBar(),
+                      true => AttendanceScanModePicker(),
+                    },
+                  ),
+                  AspectRatio(aspectRatio: 1, child: AttendanceModeSwitch()),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AttendanceModeSwitch extends ConsumerWidget {
+  const AttendanceModeSwitch({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return IconButton.filled(
+      icon: Icon(Symbols.swap_horiz),
+      onPressed: () {
+        final isScanningMode = ref.read(IsScanningNotifier.provider);
+        final notifier = ref.read(IsScanningNotifier.instance);
+        notifier.set(!isScanningMode);
+      },
+    );
+  }
+}
+
+class AttendanceScanModePicker extends ConsumerWidget {
+  const AttendanceScanModePicker({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentMode = ref.read(ScanModeNotifier.provider);
+    return DropdownMenu(
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: ref.watch(scanningBackgroundColorProvider),
+      ),
+      label: Text("Chế độ"),
+      expandedInsets: EdgeInsetsGeometry.zero,
+      initialSelection: currentMode,
+      dropdownMenuEntries: [
+        for (final scanMode in ScanningMode.values)
+          DropdownMenuEntry(label: scanMode.label, value: scanMode),
+      ],
+      onSelected: (mode) {
+        ref.read(ScanModeNotifier.instance).set(mode ?? currentMode);
+      },
+    );
+  }
+}
+
+class AttendanceScanner extends StatefulWidget {
+  final int sessionId;
+  const AttendanceScanner({super.key, required this.sessionId});
+
+  @override
+  State<AttendanceScanner> createState() => _AttendanceScannerState();
+}
+
+class AttendanceSearchBar extends ConsumerWidget {
+  const AttendanceSearchBar({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return TextField(
+      controller: searchTextController,
+      decoration: InputDecoration(
+        label: Text("Lọc sinh viên"),
+        prefixIcon: Icon(Symbols.search),
+      ),
+      focusNode: focusNode(searchTextController),
+    );
+  }
+
+  FocusNode focusNode(TextEditingController controller) {
+    final focusNode = FocusNode();
+    focusNode.addListener(() {
+      if (focusNode.hasPrimaryFocus) {
+        controller.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: controller.text.length,
+        );
+      }
+    });
+
+    return focusNode;
+  }
 }
 
 class AttendanceSessionCreateButton extends StatelessWidget {
@@ -211,6 +369,48 @@ class AttendanceSessionStudentListView extends ConsumerWidget {
   }
 }
 
+class ScanMessage extends ConsumerWidget {
+  const ScanMessage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return TextField(
+      decoration: InputDecoration(
+        hintText: "Thông tin scan sẽ hiển thị ở đây",
+      ),
+      readOnly: true,
+      controller: ref.read(ScanMessageNotifier.instance).controller,
+    );
+  }
+}
+
+class SessionDeleteButton extends StatelessWidget {
+  final int sessionId;
+
+  const SessionDeleteButton({super.key, required this.sessionId});
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = ProviderScope.containerOf(context);
+    final navigator = Navigator.of(context);
+    return IconButton(
+      onPressed: () async {
+        final ok = await showConfirmationDialog(
+          context: context,
+          titleText: "Xóa buổi điểm danh?",
+          confirmText: "XÓA",
+        );
+        if (!ok) return;
+
+        final db = await ref.read(databaseProvider.future);
+        await db.deleteAttendanceSession(sessionId);
+        navigator.pop();
+      },
+      icon: Icon(Symbols.delete),
+    );
+  }
+}
+
 class _Action extends StatelessWidget {
   final StudentData student;
   final AttendanceData attendance;
@@ -258,154 +458,6 @@ class _Action extends StatelessWidget {
       ],
     );
   }
-}
-
-class AttendanceSearchBar extends ConsumerWidget {
-  const AttendanceSearchBar({super.key});
-
-  FocusNode focusNode(TextEditingController controller) {
-    final focusNode = FocusNode();
-    focusNode.addListener(() {
-      if (focusNode.hasPrimaryFocus) {
-        controller.selection = TextSelection(
-          baseOffset: 0,
-          extentOffset: controller.text.length,
-        );
-      }
-    });
-
-    return focusNode;
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return TextField(
-      controller: searchTextController,
-      decoration: InputDecoration(
-        label: Text("Lọc sinh viên"),
-        prefixIcon: Icon(Symbols.search),
-      ),
-      focusNode: focusNode(searchTextController),
-    );
-  }
-}
-
-class AttendanceModeSwitch extends ConsumerWidget {
-  const AttendanceModeSwitch({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return IconButton.filled(
-      icon: Icon(Symbols.swap_horiz),
-      onPressed: () {
-        final isScanningMode = ref.read(IsScanningNotifier.provider);
-        final notifier = ref.read(IsScanningNotifier.instance);
-        notifier.set(!isScanningMode);
-      },
-    );
-  }
-}
-
-class AttendanceListPage extends ConsumerWidget {
-  final int sessionId;
-
-  const AttendanceListPage({
-    super.key,
-    required this.sessionId,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final scanMode = ref.watch(IsScanningNotifier.provider);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Điểm danh"),
-        actions: [
-          SessionDeleteButton(sessionId: sessionId),
-          AddStudentButton(sessionId: sessionId),
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(context.gutter),
-        child: Column(
-          spacing: context.gutter,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: switch (scanMode) {
-                false => AttendanceSessionStudentListView(sessionId: sessionId),
-                true => AttendanceScanner(sessionId: sessionId),
-              },
-            ),
-            if (scanMode) ScanMessage(),
-            IntrinsicHeight(
-              child: Row(
-                spacing: context.gutter,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: switch (scanMode) {
-                      false => AttendanceSearchBar(),
-                      true => AttendanceScanModePicker(),
-                    },
-                  ),
-                  AspectRatio(aspectRatio: 1, child: AttendanceModeSwitch()),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ScanMessage extends ConsumerWidget {
-  const ScanMessage({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: "Thông tin scan sẽ hiển thị ở đây",
-      ),
-      readOnly: true,
-      controller: ref.read(ScanMessageNotifier.instance).controller,
-    );
-  }
-}
-
-class AttendanceScanModePicker extends ConsumerWidget {
-  const AttendanceScanModePicker({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentMode = ref.read(ScanModeNotifier.provider);
-    return DropdownMenu(
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: ref.watch(scanningBackgroundColorProvider),
-      ),
-      label: Text("Chế độ"),
-      expandedInsets: EdgeInsetsGeometry.zero,
-      initialSelection: currentMode,
-      dropdownMenuEntries: [
-        for (final scanMode in ScanningMode.values)
-          DropdownMenuEntry(label: scanMode.label, value: scanMode),
-      ],
-      onSelected: (mode) {
-        ref.read(ScanModeNotifier.instance).set(mode ?? currentMode);
-      },
-    );
-  }
-}
-
-class AttendanceScanner extends StatefulWidget {
-  final int sessionId;
-  const AttendanceScanner({super.key, required this.sessionId});
-
-  @override
-  State<AttendanceScanner> createState() => _AttendanceScannerState();
 }
 
 class _AttendanceScannerState extends State<AttendanceScanner> {
@@ -497,60 +549,6 @@ class _AttendanceScannerState extends State<AttendanceScanner> {
         messenger.hideCurrentSnackBar();
         messenger.showSnackBar(SnackBar(content: Text(notification)));
       },
-    );
-  }
-}
-
-class AddStudentButton extends StatelessWidget {
-  final int sessionId;
-
-  const AddStudentButton({super.key, required this.sessionId});
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: () async {
-        final ref = ProviderScope.containerOf(context);
-
-        final companion = await context.router.toAddStudentPage();
-        if (companion == null) {
-          return;
-        }
-
-        final db = await ref.read(databaseProvider.future);
-        await db.addStudent(
-          sessionId: sessionId,
-          studentCompanion: companion,
-        );
-      },
-      icon: Icon(Symbols.add),
-    );
-  }
-}
-
-class SessionDeleteButton extends StatelessWidget {
-  final int sessionId;
-
-  const SessionDeleteButton({super.key, required this.sessionId});
-
-  @override
-  Widget build(BuildContext context) {
-    final ref = ProviderScope.containerOf(context);
-    final navigator = Navigator.of(context);
-    return IconButton(
-      onPressed: () async {
-        final ok = await showConfirmationDialog(
-          context: context,
-          titleText: "Xóa buổi điểm danh?",
-          confirmText: "XÓA",
-        );
-        if (!ok) return;
-
-        final db = await ref.read(databaseProvider.future);
-        await db.deleteAttendanceSession(sessionId);
-        navigator.pop();
-      },
-      icon: Icon(Symbols.delete),
     );
   }
 }
