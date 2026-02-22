@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:riverpod/riverpod.dart';
 
 /// This service handles app preferences
 class PreferenceService {

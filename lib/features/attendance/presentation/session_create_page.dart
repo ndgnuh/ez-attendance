@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 
+/// What the hell is this screen
 class AttendanceSessionCreatePage extends StatelessWidget {
   final int courseClassId;
 

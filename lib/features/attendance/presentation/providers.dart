@@ -7,8 +7,9 @@ import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod/riverpod.dart';
 
-import '../../core/enums.dart';
-import './data_model.dart';
+import '../../../core/enums.dart';
+import '../domain/dao.dart';
+import '../domain/data_model.dart';
 
 final searchTextController = TextEditingController();
 final searchTextProvider = Provider((ref) {

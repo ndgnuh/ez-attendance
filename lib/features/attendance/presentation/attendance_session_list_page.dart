@@ -1,8 +1,13 @@
+/// Page that list the attendance session with in a course class.
+/// Export [AttendanceSessionListPage] widget (a page).
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../attendance/attendance.dart';
+import 'widgets/attendance_session_list_view.dart';
+import 'widgets/session_create_button.dart';
 
 class AttendanceSessionListPage extends StatelessWidget {
   final int courseClassId;

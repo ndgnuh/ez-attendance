@@ -44,42 +44,15 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final useDarkModeAsync = ref.watch(useDarkModeProvider);
-    final darkMode = useDarkModeAsync.when(
-      data: (useDarkMode) => useDarkMode ?? false,
-      loading: () => false,
-      error: (e, st) => false,
-    );
-
-    final buttonShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.zero,
-    );
-    ThemeData theme = darkMode ? ThemeData.dark() : ThemeData.light();
-    theme = theme.copyWith(
-      // remove all the rounded corners
-      cardTheme: theme.cardTheme.copyWith(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      ),
-      dialogTheme: theme.dialogTheme.copyWith(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      ),
-      buttonTheme: theme.buttonTheme.copyWith(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          shape: buttonShape,
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          shape: buttonShape,
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          shape: buttonShape,
-        ),
-      ),
+    final themeMode = useDarkModeAsync.when(
+      data:
+          (useDarkMode) => switch (useDarkMode) {
+            null => ThemeMode.system,
+            true => ThemeMode.dark,
+            false => ThemeMode.light,
+          },
+      loading: () => ThemeMode.system,
+      error: (e, st) => ThemeMode.system,
     );
 
     final subThemesData = FlexSubThemesData(
@@ -114,6 +87,7 @@ class MyApp extends ConsumerWidget {
         subThemesData: subThemesData,
         keyColors: const FlexKeyColors(),
       ),
+      themeMode: themeMode,
       home: AppRouter(context).homePage(),
       builder:
           (context, child) => SafeArea(

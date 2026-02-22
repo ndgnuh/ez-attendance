@@ -1,9 +1,9 @@
-import 'package:checkin_tool/design.dart';
-import 'package:checkin_tool/features/course_class_management/presentation/management_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 
-import '../../course_class_management/presentation/list_tab_view.dart';
+import '../../../core/router.dart';
+import '../../../design.dart';
+import '../../course_class_management/course_class_management.dart';
 
 class HomePage extends StatelessWidget {
   final tabs = const [
@@ -39,7 +39,7 @@ class HomePage extends StatelessWidget {
 class _SettingsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final messenger = ScaffoldMessenger.of(context);
+    final router = AppRouter(context);
     return SingleChildScrollView(
       padding: EdgeInsets.all(context.gutter),
       child: Column(
@@ -52,9 +52,7 @@ class _SettingsTab extends StatelessWidget {
                 title: Text("Cài đặt"),
                 subtitle: Text("Tới trang cài đặt"),
                 onTap: () {
-                  messenger.showSnackBar(
-                    SnackBar(content: Text("Chưa được phát triển")),
-                  );
+                  router.toSettingsPage();
                 },
               ),
             ],
