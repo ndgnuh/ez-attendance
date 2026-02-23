@@ -73,7 +73,7 @@ extension Dao on AppDatabase {
 
     // Order
     stmt.orderBy([
-      OrderingTerm.asc(student.firstName),
+      OrderingTerm.asc(student.sortKey),
       OrderingTerm.asc(student.id),
     ]);
 

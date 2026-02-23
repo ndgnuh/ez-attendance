@@ -1,15 +1,16 @@
+import 'package:checkin_tool/shared/context.dart';
 import 'package:flutter/material.dart';
 
 /// Show a dialog to confirm user actions
 Future<bool> showConfirmationDialog({
-  required BuildContext context,
+  BuildContext? context,
   Widget? title,
   String? titleText,
   String? cancelText,
   String? confirmText,
 }) async {
   final result = await showDialog(
-    context: context,
+    context: context ?? navigationKey.currentContext!,
     builder: (context) {
       return ConfirmationDialog(
         title: title,

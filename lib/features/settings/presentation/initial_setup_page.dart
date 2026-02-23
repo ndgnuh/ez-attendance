@@ -1,15 +1,12 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
-import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../../core/database/database.dart';
-import '../../../shared/providers.dart';
+import '../../../core/preference_service.dart';
+import '../domain/database_setup.dart';
+import 'widgets/storage_permission_tile.dart';
 
 class InitialSetupPage extends StatelessWidget {
   const InitialSetupPage({super.key});
@@ -35,9 +32,7 @@ class InitialSetupPage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _StoragePermissionTile(),
-                    Divider(),
-                    _AppStoragePicker(),
+                    StoragePermissionTile(),
                     Divider(),
                     _DatabasePathPicker(),
                     Divider(),
@@ -50,32 +45,6 @@ class InitialSetupPage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _AppStoragePicker extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final appStoragePathAsync = ref.watch(appStoragePathProvider);
-    final value = appStoragePathAsync.when(
-      data: (path) => path,
-      loading: () => null,
-      error: (e, st) => null,
-    );
-
-    return ListTile(
-      title: const Text('Thư mục lưu trữ dữ liệu'),
-      subtitle: Text(value ?? 'Chưa chọn'),
-      trailing: Icon(Symbols.folder_open),
-      onTap: () async {
-        final directory = await FilePicker.platform.getDirectoryPath(
-          dialogTitle: 'Chọn thư mục lưu trữ dữ liệu',
-        );
-        if (directory != null) {
-          ref.read(appStoragePathProvider.notifier).set(directory);
-        }
-      },
     );
   }
 }
@@ -101,14 +70,12 @@ class _DarkModeSwitch extends ConsumerWidget {
 class _DatabasePathPicker extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appStoragePathAsync = ref.watch(appStoragePathProvider);
-
     bool enabled = true;
-    enabled &= appStoragePathAsync.when(
-      data: (path) => path != null,
-      loading: () => false,
-      error: (e, st) => false,
-    );
+    // enabled &= appStoragePathAsync.when(
+    //   data: (path) => path != null,
+    //   loading: () => false,
+    //   error: (e, st) => false,
+    // );
 
     enabled &= ref
         .watch(storagePermissionProvider)
@@ -135,44 +102,8 @@ class _DatabasePathPicker extends ConsumerWidget {
     );
   }
 
-  Future<void> createNewDatabase(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
-    final dbBytes = await AppDatabase.createTemporaryDatabase();
-    final initialDirectory = await ref.watch(appStoragePathProvider.future);
-    final savedPath = await FilePicker.platform.saveFile(
-      dialogTitle: 'Lưu cơ sở dữ liệu mới',
-      fileName: 'attendance_database.sqlite',
-      initialDirectory: initialDirectory as String,
-      bytes: dbBytes,
-    );
-    switch (savedPath) {
-      case String path:
-        ref.read(appDatabasePathProvider.notifier).set(path);
-      case null:
-      // User cancelled the save dialog
-    }
-  }
-
-  Future<void> pickExistingDatabase(
-    BuildContext context,
-    WidgetRef ref,
-  ) async {
-    final initialDirectory = await ref.watch(appStoragePathProvider.future);
-
-    final databasePath = await FilesystemPicker.open(
-      context: context,
-      rootDirectory: Directory(initialDirectory as String),
-      pickText: 'Chọn cơ sở dữ liệu',
-    );
-
-    if (databasePath != null) {
-      ref.read(appDatabasePathProvider.notifier).set(databasePath);
-    }
-  }
-
   void showOptions(BuildContext context, WidgetRef ref) {
+    final logic = ref.read(databaseSetupLogicProvider);
     showDialog(
       context: context,
       builder: (context) {
@@ -182,14 +113,14 @@ class _DatabasePathPicker extends ConsumerWidget {
               title: const Text('Chọn cơ sở dữ liệu hiện có'),
               onTap: () {
                 Navigator.of(context).pop();
-                pickExistingDatabase(context, ref);
+                logic.pickExistingDatabase();
               },
             ),
             ListTile(
               title: const Text('Tạo cơ sở dữ liệu mới'),
               onTap: () {
                 Navigator.of(context).pop();
-                createNewDatabase(context, ref);
+                logic.createNewDatabase();
               },
             ),
           ],
@@ -205,13 +136,6 @@ class _FinishSetupButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var finished = true;
-
-    finished &= ref
-        .watch(appStoragePathProvider)
-        .maybeWhen(
-          data: (path) => path != null,
-          orElse: () => false,
-        );
 
     finished &= ref
         .watch(appDatabasePathProvider)
@@ -248,30 +172,6 @@ class _FinishSetupButton extends ConsumerWidget {
       label: const Text('Hoàn tất thiết lập'),
       icon: Icon(Symbols.check_circle),
       onPressed: finished ? callback : null,
-    );
-  }
-}
-
-class _StoragePermissionTile extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final storagePermissionAsync = ref.watch(storagePermissionProvider);
-    final granted = storagePermissionAsync.when(
-      data: (status) => status.isGranted,
-      loading: () => false,
-      error: (e, st) => false,
-    );
-
-    return ListTile(
-      title: const Text('Quyền truy cập bộ nhớ'),
-      subtitle: Text(granted ? 'Đã cấp quyền' : 'Chưa cấp quyền'),
-      trailing: Icon(
-        granted ? Symbols.check_circle : Symbols.error,
-        color: granted ? Colors.green : Colors.red,
-      ),
-      onTap: () {
-        ref.read(storagePermissionProvider.notifier).request();
-      },
     );
   }
 }

@@ -133,7 +133,7 @@ class Student extends Table {
   TextColumn get name => text()();
 
   // Generated columns
-  TextColumn get firstName =>
+  TextColumn get sortKey =>
       text().generatedAs(
         FunctionCallExpression("getFirstName", [name]),
         stored: true,

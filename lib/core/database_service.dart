@@ -1,33 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-import '../shared/providers/local_preferences.dart';
 import './database/database.dart';
+import './preference_service.dart';
 
 export './database/database.dart';
 
 final databaseProvider = FutureProvider<AppDatabase>((ref) async {
-  final dbPathAsync = await ref.watch(appDatabasePathProvider.future);
-  if (dbPathAsync == null) {
+  final dbPath = await ref.watch(appDatabasePathProvider.future);
+  print("Database path: $dbPath");
+  if (dbPath == null) {
     throw Exception('Database path is not set');
   }
 
-  final db = await ref.watch(maybeDatabaseProvider.future);
-  assert(db != null, 'Failed to open database at $dbPathAsync');
-  return db!;
-});
-
-final maybeDatabaseProvider = FutureProvider<AppDatabase?>((ref) async {
-  final dbPathAsync = await ref.watch(appDatabasePathProvider.future);
-  if (dbPathAsync == null) {
-    return null;
-  } else {
-    try {
-      return AppDatabase.openLocalDatabase(dbPathAsync);
-    } catch (e) {
-      return null;
-    }
+  final perm = await ref.watch(storagePermissionProvider.future);
+  if (!perm.isGranted) {
+    throw Exception("Không đọc được CSDL");
   }
+
+  final db = AppDatabase.openLocalDatabase(dbPath);
+  return db;
 });
 
 extension DatabaseService on BuildContext {

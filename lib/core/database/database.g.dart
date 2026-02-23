@@ -1246,12 +1246,12 @@ class $StudentTable extends Student with TableInfo<$StudentTable, StudentData> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _firstNameMeta = const VerificationMeta(
-    'firstName',
+  static const VerificationMeta _sortKeyMeta = const VerificationMeta(
+    'sortKey',
   );
   @override
-  late final GeneratedColumn<String> firstName = GeneratedColumn<String>(
-    'first_name',
+  late final GeneratedColumn<String> sortKey = GeneratedColumn<String>(
+    'sort_key',
     aliasedName,
     false,
     generatedAs: GeneratedAs(
@@ -1277,7 +1277,7 @@ class $StudentTable extends Student with TableInfo<$StudentTable, StudentData> {
     requiredDuringInsert: false,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, email, name, firstName, searchKey];
+  List<GeneratedColumn> get $columns => [id, email, name, sortKey, searchKey];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1311,10 +1311,10 @@ class $StudentTable extends Student with TableInfo<$StudentTable, StudentData> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    if (data.containsKey('first_name')) {
+    if (data.containsKey('sort_key')) {
       context.handle(
-        _firstNameMeta,
-        firstName.isAcceptableOrUnknown(data['first_name']!, _firstNameMeta),
+        _sortKeyMeta,
+        sortKey.isAcceptableOrUnknown(data['sort_key']!, _sortKeyMeta),
       );
     }
     if (data.containsKey('search_key')) {
@@ -1347,10 +1347,10 @@ class $StudentTable extends Student with TableInfo<$StudentTable, StudentData> {
             DriftSqlType.string,
             data['${effectivePrefix}name'],
           )!,
-      firstName:
+      sortKey:
           attachedDatabase.typeMapping.read(
             DriftSqlType.string,
-            data['${effectivePrefix}first_name'],
+            data['${effectivePrefix}sort_key'],
           )!,
       searchKey:
           attachedDatabase.typeMapping.read(
@@ -1370,13 +1370,13 @@ class StudentData extends DataClass implements Insertable<StudentData> {
   final String id;
   final String email;
   final String name;
-  final String firstName;
+  final String sortKey;
   final String searchKey;
   const StudentData({
     required this.id,
     required this.email,
     required this.name,
-    required this.firstName,
+    required this.sortKey,
     required this.searchKey,
   });
   @override
@@ -1405,7 +1405,7 @@ class StudentData extends DataClass implements Insertable<StudentData> {
       id: serializer.fromJson<String>(json['id']),
       email: serializer.fromJson<String>(json['email']),
       name: serializer.fromJson<String>(json['name']),
-      firstName: serializer.fromJson<String>(json['firstName']),
+      sortKey: serializer.fromJson<String>(json['sortKey']),
       searchKey: serializer.fromJson<String>(json['searchKey']),
     );
   }
@@ -1416,7 +1416,7 @@ class StudentData extends DataClass implements Insertable<StudentData> {
       'id': serializer.toJson<String>(id),
       'email': serializer.toJson<String>(email),
       'name': serializer.toJson<String>(name),
-      'firstName': serializer.toJson<String>(firstName),
+      'sortKey': serializer.toJson<String>(sortKey),
       'searchKey': serializer.toJson<String>(searchKey),
     };
   }
@@ -1425,13 +1425,13 @@ class StudentData extends DataClass implements Insertable<StudentData> {
     String? id,
     String? email,
     String? name,
-    String? firstName,
+    String? sortKey,
     String? searchKey,
   }) => StudentData(
     id: id ?? this.id,
     email: email ?? this.email,
     name: name ?? this.name,
-    firstName: firstName ?? this.firstName,
+    sortKey: sortKey ?? this.sortKey,
     searchKey: searchKey ?? this.searchKey,
   );
   @override
@@ -1440,14 +1440,14 @@ class StudentData extends DataClass implements Insertable<StudentData> {
           ..write('id: $id, ')
           ..write('email: $email, ')
           ..write('name: $name, ')
-          ..write('firstName: $firstName, ')
+          ..write('sortKey: $sortKey, ')
           ..write('searchKey: $searchKey')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, email, name, firstName, searchKey);
+  int get hashCode => Object.hash(id, email, name, sortKey, searchKey);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1455,7 +1455,7 @@ class StudentData extends DataClass implements Insertable<StudentData> {
           other.id == this.id &&
           other.email == this.email &&
           other.name == this.name &&
-          other.firstName == this.firstName &&
+          other.sortKey == this.sortKey &&
           other.searchKey == this.searchKey);
 }
 
@@ -3830,8 +3830,8 @@ class $$StudentTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get firstName => $composableBuilder(
-    column: $table.firstName,
+  ColumnFilters<String> get sortKey => $composableBuilder(
+    column: $table.sortKey,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3915,8 +3915,8 @@ class $$StudentTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get firstName => $composableBuilder(
-    column: $table.firstName,
+  ColumnOrderings<String> get sortKey => $composableBuilder(
+    column: $table.sortKey,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3944,8 +3944,8 @@ class $$StudentTableAnnotationComposer
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
 
-  GeneratedColumn<String> get firstName =>
-      $composableBuilder(column: $table.firstName, builder: (column) => column);
+  GeneratedColumn<String> get sortKey =>
+      $composableBuilder(column: $table.sortKey, builder: (column) => column);
 
   GeneratedColumn<String> get searchKey =>
       $composableBuilder(column: $table.searchKey, builder: (column) => column);

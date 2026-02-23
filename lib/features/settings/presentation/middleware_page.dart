@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../core/preference_service.dart';
 import '../../../core/router.dart';
-import '../../../shared/providers/local_preferences.dart';
 
 /// This page is just a page to check if initial setting
 /// has been setup (e.g. where the database is). If not, move to

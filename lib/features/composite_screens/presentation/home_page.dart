@@ -52,7 +52,7 @@ class _SettingsTab extends StatelessWidget {
                 title: Text("Cài đặt"),
                 subtitle: Text("Tới trang cài đặt"),
                 onTap: () {
-                  router.toSettingsPage();
+                  router.toInitialSetupPage();
                 },
               ),
             ],

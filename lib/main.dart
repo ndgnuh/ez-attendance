@@ -7,25 +7,11 @@ import 'package:intl/intl.dart';
 
 import './core/router.dart';
 import './shared/context.dart';
-import './shared/providers/local_preferences.dart';
+import './core/preference_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Intl.defaultLocale = 'vi_VN';
-
-  // File("./db.sqlite").deleteSync();
-
-  // final db = AppDatabase();
-  // final s = await db.managers.semester.get();
-  //
-  // db.course.insertAll([
-  //   CourseCompanion.insert(id: 'MI1111', name: 'Giải tích I'),
-  //   CourseCompanion.insert(id: 'MI1112', name: 'Giải tích I'),
-  //   CourseCompanion.insert(id: 'MI1113', name: 'Giải tích I'),
-  //   CourseCompanion.insert(id: 'MI1114', name: 'Giải tích I'),
-  //   CourseCompanion.insert(id: 'MI1111E', name: 'Giải tích I'),
-  // ]);
-  // print(s);
 
   runApp(
     ProviderScope(
