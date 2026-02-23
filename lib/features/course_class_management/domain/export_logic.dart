@@ -22,8 +22,10 @@ final classAttendanceXlsxProvider = FutureProvider.family(
     final bytes = await Isolate.run(
       () => _buildCourseClassAttendanceXlsx(data: data),
     );
+    final now = DateTime.now();
+    final timestamp = DateFormat("yyMMddHHmm").format(now);
     final courseClass = await ref.watch(_classProvider(courseClassId).future);
-    final name = "ChuyenCan_TichCuc_${courseClass.classCode}";
+    final name = "CCTC-${courseClass.classCode}-$timestamp";
     return NamedFile(name: name, bytes: bytes, extension: "xlsx");
   },
 );
@@ -152,16 +154,9 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
 }) {
   /// Create the file
   final xlsx = Excel.createExcel();
-  final sheetName = xlsx.getDefaultSheet() ?? xlsx.sheets.keys.first;
-  final sheet = xlsx[sheetName];
-
-  // Header row
-  final dateFormat = DateFormat("dd-MM-yyyy");
-  final headerTexts = [
-    "STT",
-    "Họ và tên",
-    for (final session in data.sessionList) dateFormat.format(session.date),
-  ];
+  final attendanceSheet = xlsx["Điểm danh"];
+  final contributionSheet = xlsx["Tích cực"];
+  final sheets = {attendanceSheet, contributionSheet};
 
   // Base cell style
   final baseStyle = CellStyle(
@@ -171,85 +166,113 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
     fontSize: 11,
   );
 
-  /// Write header row
-  for (final (i, headerText) in headerTexts.indexed) {
-    final cellIndex = CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0);
-    final cell = sheet.cell(cellIndex);
-    cell.value = TextCellValue(headerText);
-    cell.cellStyle = baseStyle.copyWith(boldVal: true);
-  }
-
   /// Map session to index
   final inverseSessionMap = data.inverseSessionById;
 
   /// Table of attendance data
   final attendanceByStudent = data.attendanceByStudent;
-  final columnOffset = 2;
-  final rowOffset = 1;
-  for (final (i, student) in data.studentList.indexed) {
-    final attendanceMap = attendanceByStudent[student]!;
-    final rowIndex = rowOffset + i;
 
-    /// Write student ID
-    final idCell = sheet.cell(
-      CellIndex.indexByColumnRow(
-        columnIndex: 0,
-        rowIndex: rowIndex,
-      ),
-    );
-    idCell.value = TextCellValue(student.id);
-    idCell.cellStyle = baseStyle;
+  void buildSheet(
+    Sheet sheet,
+    CellValue Function(AttendanceData) tableCellBuilder,
+  ) {
+    // Header row
+    final dateFormat = DateFormat("dd-MM-yyyy");
+    final headerTexts = [
+      "MSSV",
+      "Họ và tên",
+      for (final session in data.sessionList) dateFormat.format(session.date),
+    ];
 
-    /// Write student name
-    final nameCell = sheet.cell(
-      CellIndex.indexByColumnRow(
-        columnIndex: 1,
-        rowIndex: rowIndex,
-      ),
-    );
-    nameCell.value = TextCellValue(student.name);
-    nameCell.cellStyle = baseStyle.copyWith(
-      horizontalAlignVal: HorizontalAlign.Left,
-    );
-
-    /// Write attendance data
-    for (final session in data.sessionList) {
-      /// Get attendance data
-      final defaultAttendance = AttendanceData(
-        sessionId: session.id,
-        studentId: student.id,
-        attendanceStatus: AttendanceStatus.unknown,
-        numContributions: 0,
-      );
-      final attendance = attendanceMap[session] ?? defaultAttendance;
-
-      /// Get cell index
-      final columnIndex = columnOffset + inverseSessionMap[session]!;
-      final cellIndex = CellIndex.indexByColumnRow(
-        columnIndex: columnIndex,
-        rowIndex: rowIndex,
-      );
-
-      /// Set cell data
-      final attendanceText = switch (attendance.attendanceStatus) {
-        AttendanceStatus.unknown => "?",
-        AttendanceStatus.present => "Có",
-        AttendanceStatus.absent => "Vắng",
-        AttendanceStatus.late => "Muộn",
-        AttendanceStatus.excused => "Phép",
-      };
+    /// Write header row
+    for (final (i, headerText) in headerTexts.indexed) {
+      final cellIndex = CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0);
       final cell = sheet.cell(cellIndex);
-      cell.value = TextCellValue(attendanceText);
-      cell.cellStyle = baseStyle;
+      cell.value = TextCellValue(headerText);
+      cell.cellStyle = baseStyle.copyWith(boldVal: true);
     }
+
+    final columnOffset = 2;
+    final rowOffset = 1;
+    for (final (i, student) in data.studentList.indexed) {
+      final attendanceMap = attendanceByStudent[student]!;
+      final rowIndex = rowOffset + i;
+
+      /// Write student ID
+      final idCell = sheet.cell(
+        CellIndex.indexByColumnRow(
+          columnIndex: 0,
+          rowIndex: rowIndex,
+        ),
+      );
+      idCell.value = TextCellValue(student.id);
+      idCell.cellStyle = baseStyle.copyWith(
+        horizontalAlignVal: HorizontalAlign.Left,
+      );
+
+      /// Write student name
+      final nameCell = sheet.cell(
+        CellIndex.indexByColumnRow(
+          columnIndex: 1,
+          rowIndex: rowIndex,
+        ),
+      );
+      nameCell.value = TextCellValue(student.name);
+      nameCell.cellStyle = baseStyle.copyWith(
+        horizontalAlignVal: HorizontalAlign.Left,
+      );
+
+      /// Write attendance data
+      for (final session in data.sessionList) {
+        /// Get attendance data
+        final defaultAttendance = AttendanceData(
+          sessionId: session.id,
+          studentId: student.id,
+          attendanceStatus: AttendanceStatus.unknown,
+          numContributions: 0,
+        );
+        final attendance = attendanceMap[session] ?? defaultAttendance;
+
+        /// Get cell index
+        final columnIndex = columnOffset + inverseSessionMap[session]!;
+        final cellIndex = CellIndex.indexByColumnRow(
+          columnIndex: columnIndex,
+          rowIndex: rowIndex,
+        );
+
+        /// Set cell data
+        final cell = sheet.cell(cellIndex);
+        cell.value = tableCellBuilder(attendance);
+        cell.cellStyle = baseStyle;
+      }
+    }
+
+    /// Auto column width
+    _sheetAutoWidth(sheet, padding: 1);
+    sheet.setDefaultRowHeight(18);
   }
 
-  /// Auto column width
-  print(sheet.maxRows);
-  print(sheet.maxColumns);
-  _sheetAutoWidth(sheet);
+  buildSheet(attendanceSheet, (attendance) {
+    final attendanceText = switch (attendance.attendanceStatus) {
+      AttendanceStatus.unknown => "?",
+      AttendanceStatus.present => "Có",
+      AttendanceStatus.absent => "Vắng",
+      AttendanceStatus.late => "Muộn",
+      AttendanceStatus.excused => "Phép",
+    };
+    return TextCellValue(attendanceText);
+  });
 
-  /// Table of contribution data
+  buildSheet(contributionSheet, (attendance) {
+    return IntCellValue(attendance.numContributions);
+  });
+
+  /// remove unused sheets
+  for (final entry in xlsx.sheets.entries) {
+    if (!sheets.contains(entry.value)) {
+      xlsx.delete(entry.key);
+    }
+  }
 
   /// Save xslx file
   return xlsx.save() as Uint8List;

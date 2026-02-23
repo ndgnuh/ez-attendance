@@ -4,7 +4,6 @@ import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../core/database_service.dart';
 import '../../../core/router.dart';
 import '../../../design.dart';
 import '../domain/dao.dart';
@@ -75,21 +74,18 @@ class CourseClassDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: tabs.length,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Course Class Details'),
-          bottom: TabBar(isScrollable: true, tabs: tabs),
-        ),
-        body: TabBarView(
-          children: [
-            _GeneralInfoTab(id: id),
-            _ClassStudentsTab(id: id),
-            _GeneralInfoTab(id: id),
-          ],
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Thông tin lớp'),
       ),
+      body: _GeneralInfoTab(id: id),
+      // body: TabBarView(
+      //   children: [
+      //     _GeneralInfoTab(id: id),
+      //     _ClassStudentsTab(id: id),
+      //     _GeneralInfoTab(id: id),
+      //   ],
+      // ),
     );
   }
 }
@@ -154,6 +150,9 @@ class _GeneralInfoTab extends ConsumerWidget {
         trailing: Icon(Symbols.chevron_forward),
         onTap: () => router.toAttendanceSessionListPage(id),
       ),
+    ];
+
+    final exportZone = [
       ExportClassAttendanceButton(courseClassId: id),
     ];
 
@@ -188,7 +187,7 @@ class _GeneralInfoTab extends ConsumerWidget {
       ),
     ];
 
-    return Padding(
+    return SingleChildScrollView(
       padding: EdgeInsets.all(context.gutter),
       child: Column(
         spacing: context.gutter,
@@ -196,6 +195,10 @@ class _GeneralInfoTab extends ConsumerWidget {
           CardSection(
             title: "Thông tin chung",
             children: generalInfo,
+          ),
+          CardSection(
+            title: "Ngoại vi",
+            children: exportZone,
           ),
           CardSection(
             title: "Vùng nguy hiểm",
