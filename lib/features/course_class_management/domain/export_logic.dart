@@ -22,10 +22,8 @@ final classAttendanceXlsxProvider = FutureProvider.family(
     final bytes = await Isolate.run(
       () => _buildCourseClassAttendanceXlsx(data: data),
     );
-    final now = DateTime.now();
-    final timestamp = DateFormat("yyMMddHHmm").format(now);
     final courseClass = await ref.watch(_classProvider(courseClassId).future);
-    final name = "CCTC-${courseClass.classCode}-$timestamp";
+    final name = "CCTC-${courseClass.classCode}";
     return NamedFile(name: name, bytes: bytes, extension: "xlsx");
   },
 );

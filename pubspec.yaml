@@ -60,6 +60,7 @@ dependencies:
   sqlite3: ^2.9.4
   sqflite_common_ffi: ^2.3.7+1
   external_path: ^2.2.0
+  share_plus: ^12.0.1
 
 dev_dependencies:
   flutter_test:

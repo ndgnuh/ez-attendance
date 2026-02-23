@@ -154,6 +154,7 @@ class _GeneralInfoTab extends ConsumerWidget {
 
     final exportZone = [
       ExportClassAttendanceButton(courseClassId: id),
+      ShareClassAttendanceButton(courseClassId: id),
     ];
 
     final scheduleInfo = [
