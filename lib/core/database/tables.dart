@@ -1,3 +1,5 @@
+// ignore_for_file: recursive_getters
+
 import 'package:drift/drift.dart';
 
 import '../enums.dart';
@@ -25,7 +27,22 @@ const tables = [
   Registration,
   Semester,
   Student,
+  Period,
 ];
+
+class Period extends Table {
+  IntColumn get id => integer()();
+  IntColumn get startHour =>
+      integer().check(startHour.isBetweenValues(0, 23))();
+  IntColumn get startMinute =>
+      integer().check(startMinute.isBetweenValues(0, 59))();
+  IntColumn get endHour => integer().check(endHour.isBetweenValues(0, 23))();
+  IntColumn get endMinute =>
+      integer().check(endMinute.isBetweenValues(0, 59))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
 
 class Attendance extends Table {
   TextColumn get attendanceStatus => text().map(const AttendanceConverter())();
@@ -70,8 +87,8 @@ class CourseClass extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get classCode => text()();
   IntColumn get dayOfWeek => integer().nullable()();
-  IntColumn get fromPeriod => integer().nullable()();
-  IntColumn get toPeriod => integer().nullable()();
+  IntColumn get fromPeriod => integer().references(Period, #id).nullable()();
+  IntColumn get toPeriod => integer().references(Period, #id).nullable()();
   TextColumn get location => text().nullable()();
 
   TextColumn get courseId =>

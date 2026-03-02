@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # Required: The name of the database and the path to the database file
+          databases:
+            app_database: lib/core/database/database.dart
+
+          # Optional: The directory where the test files are stored:
+          test_dir: test/drift/ # (default)
+
+          # Optional: The directory where the schema files are stored:
+          schema_dir: drift_schemas/ # (default)
