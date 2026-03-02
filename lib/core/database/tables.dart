@@ -2,22 +2,7 @@
 
 import 'package:drift/drift.dart';
 
-import '../enums.dart';
-
-class AttendanceConverter extends TypeConverter<AttendanceStatus, String> {
-  const AttendanceConverter();
-
-  @override
-  AttendanceStatus fromSql(String fromDb) {
-    return AttendanceStatus.values.firstWhere(
-      (e) => e.value == fromDb,
-      orElse: () => AttendanceStatus.unknown,
-    );
-  }
-
-  @override
-  String toSql(AttendanceStatus status) => status.value;
-}
+import 'converters.dart';
 
 const tables = [
   Course,
@@ -86,7 +71,8 @@ class Course extends Table {
 class CourseClass extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get classCode => text()();
-  IntColumn get dayOfWeek => integer().nullable()();
+  IntColumn get dayOfWeek =>
+      integer().map(DayOfWeekConverter.instance).nullable()();
   IntColumn get fromPeriod => integer().references(Period, #id).nullable()();
   IntColumn get toPeriod => integer().references(Period, #id).nullable()();
   TextColumn get location => text().nullable()();

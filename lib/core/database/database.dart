@@ -9,13 +9,15 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/common.dart' show AllowedArgumentCount, CommonDatabase;
+
 import './../enums.dart';
-import 'tables.dart';
+import './converters.dart';
+import './tables.dart';
+import './database.steps.dart';
 
 export './classes_dao.dart';
 export './semester_dao.dart';
 
-import 'database.steps.dart';
 part 'database.g.dart';
 
 final _defaultPeriods = [
@@ -112,6 +114,31 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onUpgrade: stepByStep(
+        from1To2: (migrator, schema) async {
+          migrator.createTable(schema.period);
+          // TODO: do we need to alter the table?
+          // migrator.dropColumn(schema.courseClass, "fromPeriod");
+          // migrator.dropColumn(schema.courseClass, "toPeriod");
+          // migrator.addColumn(schema.courseClass, Text)
+        },
+      ),
+      beforeOpen: (details) async {
+        if (details.hadUpgrade || details.wasCreated) {
+          final periods = await select(period).get();
+          if (periods.isEmpty) {
+            await batch((b) async {
+              b.insertAll(period, _defaultPeriods);
+            });
+          }
+        }
+      },
+    );
+  }
+
+  @override
   int get schemaVersion => 2;
 
   SimpleSelectStatement<Course, CourseData> searchCourse({
@@ -176,30 +203,5 @@ class AppDatabase extends _$AppDatabase {
     final file = File('db.sqlite');
     final db = NativeDatabase(file);
     return db;
-  }
-
-  @override
-  MigrationStrategy get migration {
-    return MigrationStrategy(
-      onUpgrade: stepByStep(
-        from1To2: (migrator, schema) async {
-          migrator.createTable(schema.period);
-          // TODO: do we need to alter the table?
-          // migrator.dropColumn(schema.courseClass, "fromPeriod");
-          // migrator.dropColumn(schema.courseClass, "toPeriod");
-          // migrator.addColumn(schema.courseClass, Text)
-        },
-      ),
-      beforeOpen: (details) async {
-        if (details.hadUpgrade || details.wasCreated) {
-          final periods = await select(period).get();
-          if (periods.isEmpty) {
-            await batch((b) async {
-              b.insertAll(period, _defaultPeriods);
-            });
-          }
-        }
-      },
-    );
   }
 }
