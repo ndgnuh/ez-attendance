@@ -67,7 +67,7 @@ enum DayOfWeek implements Comparable<DayOfWeek> {
 }
 
 enum AttendanceStatus {
-  unknown('00-unknown', 'Không rõ'),
+  unknown('00-unknown', 'Bỏ qua'),
   present('01-present', 'Có mặt'),
   absent('02-absent', 'Vắng'),
   late('03-late', 'Đi muộn'),
