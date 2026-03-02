@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gutter/flutter_gutter.dart';
 
 import 'context.dart';
 
@@ -24,6 +23,31 @@ Future<bool> showConfirmationDialog({
     },
   );
   return result ?? false;
+}
+
+/// Show a dialog to select between values
+Future<T?> showSelectionDialog<T>({
+  required List<T> values,
+  required String title,
+  required Widget Function(T) optionBuilder,
+  BuildContext? context,
+}) async {
+  return showDialog<T>(
+    context: context ?? navigationKey.currentContext!,
+    builder: (context) {
+      final navigator = Navigator.of(context);
+      return SimpleDialog(
+        title: Text(title),
+        children: [
+          for (final value in values)
+            SimpleDialogOption(
+              onPressed: () => navigator.pop(value),
+              child: optionBuilder(value),
+            ),
+        ],
+      );
+    },
+  );
 }
 
 /// Show dialog that allow typing text inside,

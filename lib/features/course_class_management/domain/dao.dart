@@ -1,3 +1,4 @@
+import 'package:checkin_tool/core/enums.dart';
 import 'package:checkin_tool/shared/providers.dart';
 import 'package:drift/drift.dart';
 import 'package:riverpod/riverpod.dart';
@@ -35,12 +36,43 @@ class CourseClassRepository {
     return stmt.watch();
   }
 
-  /// Watch the location of a course class
-  Stream<String?> watchClassLocation(int courseClassId) {
+  Stream<T?> _watchClassInfoStmt<T extends Object>({
+    required int courseClassId,
+    required Expression<T> column,
+    required T? Function(TypedResult) mapper,
+  }) {
     final stmt = db.selectOnly(db.courseClass);
-    stmt.addColumns({db.courseClass.location});
+    stmt.addColumns({column});
     stmt.where(db.courseClass.id.equals(courseClassId));
-    return stmt.map((r) => r.read(db.courseClass.location)).watchSingleOrNull();
+    return stmt.map(mapper).watchSingleOrNull();
+  }
+
+  /// Watch the location of a course class
+  Stream<String?> watchClassLocation(int courseClassId) => _watchClassInfoStmt(
+    courseClassId: courseClassId,
+    column: db.courseClass.location,
+    mapper: (r) => r.read(db.courseClass.location),
+  );
+
+  /// Watch the day of week of a course class
+  Stream<DayOfWeek?> watchClassDayOfWeek(int courseClassId) {
+    final stmt = db.selectOnly(db.courseClass);
+    stmt.addColumns({db.courseClass.dayOfWeek});
+    stmt.where(db.courseClass.id.equals(courseClassId));
+    final mapped = stmt.map(
+      (r) => r.readWithConverter(db.courseClass.dayOfWeek),
+    );
+    return mapped.watchSingleOrNull();
+  }
+
+  Future<void> updateClassSchedule({
+    required int courseClassId,
+    DayOfWeek? dayOfWeek,
+  }) async {
+    final companion = CourseClassCompanion(dayOfWeek: Value(dayOfWeek));
+    final stmt = db.update(db.courseClass);
+    stmt.where((c) => c.id.equals(courseClassId));
+    stmt.write(companion);
   }
 
   Future<void> updateClassLocation({

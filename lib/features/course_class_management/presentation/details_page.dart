@@ -9,6 +9,7 @@ import '../../../core/router.dart';
 import '../../../design.dart';
 import '../domain/dao.dart';
 import '../domain/models.dart';
+import 'widgets/day_of_week_tile.dart';
 
 class CourseClassDeleteButton extends StatelessWidget {
   final Function(BuildContext, VoidCallback) builder;
@@ -162,10 +163,7 @@ class _GeneralInfoTab extends ConsumerWidget {
 
     final scheduleInfo = [
       LocationEditTile(courseClassId: id),
-      ListTile(
-        title: Text("Ngày học"),
-        subtitle: Text('${courseClass?.dayOfWeek}'),
-      ),
+      DayOfWeekTile(courseClassId: id),
       ListTile(
         title: Text("Tiết bắt đầu"),
         subtitle: Text('${courseClass?.fromPeriod}'),
