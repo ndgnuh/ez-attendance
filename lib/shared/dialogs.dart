@@ -1,5 +1,8 @@
-import 'package:checkin_tool/shared/context.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_gutter/flutter_gutter.dart';
+
+import 'context.dart';
 
 /// Show a dialog to confirm user actions
 Future<bool> showConfirmationDialog({
@@ -21,6 +24,40 @@ Future<bool> showConfirmationDialog({
     },
   );
   return result ?? false;
+}
+
+/// Show dialog that allow typing text inside,
+Future<String?> showStringEditDialog({
+  required String title,
+  String initialValue = "",
+  String cancelText = "Hủy",
+  String confirmText = "Lưu",
+  BuildContext? context,
+  InputDecoration? decoration,
+  List<TextInputFormatter>? inputFormatters,
+}) async {
+  final controller = TextEditingController(text: initialValue);
+  return showDialog(
+    context: context ?? navigationKey.currentContext!,
+    builder: (context) {
+      final navigator = Navigator.of(context);
+      return AlertDialog(
+        title: Text(title),
+        content: TextField(
+          inputFormatters: inputFormatters,
+          enableSuggestions: true,
+          controller: controller,
+        ),
+        actions: [
+          TextButton(onPressed: () => navigator.pop(), child: Text(cancelText)),
+          TextButton(
+            onPressed: () => navigator.pop(controller.text),
+            child: Text(confirmText),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 class ConfirmationDialog extends StatelessWidget {

@@ -1,4 +1,5 @@
 import 'package:checkin_tool/features/course_class_management/presentation/widgets/export_button.dart';
+import 'package:checkin_tool/features/course_class_management/presentation/widgets/location_edit_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,7 +79,9 @@ class CourseClassDetailsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Thông tin lớp'),
       ),
-      body: _GeneralInfoTab(id: id),
+      body: SingleChildScrollView(
+        child: _GeneralInfoTab(id: id),
+      ),
       // body: TabBarView(
       //   children: [
       //     _GeneralInfoTab(id: id),
@@ -158,10 +161,7 @@ class _GeneralInfoTab extends ConsumerWidget {
     ];
 
     final scheduleInfo = [
-      ListTile(
-        title: Text("Phòng học"),
-        subtitle: Text('${courseClass?.location}'),
-      ),
+      LocationEditTile(courseClassId: id),
       ListTile(
         title: Text("Ngày học"),
         subtitle: Text('${courseClass?.dayOfWeek}'),
@@ -197,6 +197,7 @@ class _GeneralInfoTab extends ConsumerWidget {
             title: "Thông tin chung",
             children: generalInfo,
           ),
+          CardSection(title: "Thời gian biểu", children: scheduleInfo),
           CardSection(
             title: "Ngoại vi",
             children: exportZone,

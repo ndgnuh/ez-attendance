@@ -1,8 +1,58 @@
+import 'package:checkin_tool/shared/providers.dart';
 import 'package:drift/drift.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../../core/database_service.dart';
 import 'models.dart';
+
+/// Experimental class that hides all the query from riverpod.
+class CourseClassRepository {
+  final AppDatabase db;
+  const CourseClassRepository({required this.db});
+
+  /// Watch list of period
+  Stream<List<PeriodData>> watchPeriodList() {
+    final stmt = db.select(db.period);
+    stmt.orderBy([(r) => OrderingTerm.asc(r.id)]);
+    return stmt.watch();
+  }
+
+  /// Get all course classes by semester
+  Stream<List<CourseClassData>> watchCourseClassData({SemesterData? semester}) {
+    final stmt = db.select(db.courseClass);
+
+    /// Optional: filter by semester
+    switch (semester) {
+      case SemesterData semester:
+        stmt.where((r) => r.semesterId.equals(semester.id));
+    }
+
+    stmt.orderBy([
+      (r) => OrderingTerm.desc(r.semesterId),
+      (r) => OrderingTerm(expression: r.dayOfWeek),
+      (r) => OrderingTerm(expression: r.fromPeriod),
+    ]);
+    return stmt.watch();
+  }
+
+  /// Watch the location of a course class
+  Stream<String?> watchClassLocation(int courseClassId) {
+    final stmt = db.selectOnly(db.courseClass);
+    stmt.addColumns({db.courseClass.location});
+    stmt.where(db.courseClass.id.equals(courseClassId));
+    return stmt.map((r) => r.read(db.courseClass.location)).watchSingleOrNull();
+  }
+
+  Future<void> updateClassLocation({
+    required int courseClassId,
+    required String newLocation,
+  }) async {
+    final companion = CourseClassCompanion(location: Value(newLocation));
+    final stmt = db.update(db.courseClass);
+    stmt.where((c) => c.id.equals(courseClassId));
+    stmt.write(companion);
+  }
+}
 
 /// Service for managing course classes
 class CourseClassManagementService {

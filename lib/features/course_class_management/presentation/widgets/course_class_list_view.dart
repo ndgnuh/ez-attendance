@@ -1,4 +1,5 @@
 import 'package:checkin_tool/core/router.dart';
+import 'package:checkin_tool/features/attendance/domain/data_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -59,6 +60,7 @@ class _CourseClassListItem extends ConsumerWidget {
         break;
     }
 
+    /// TODO: move to a CourseClassItemViewModel
     final model = modelAsync.value;
     final courseClass = model.courseClass;
     final course = model.course;
@@ -66,10 +68,22 @@ class _CourseClassListItem extends ConsumerWidget {
 
     final router = AppRouter(context);
 
-    final title = 'Lớp ${courseClass.classCode}';
+    final title = '${course.name} - ${course.id} - ${courseClass.classCode}';
+    final time = switch ((
+      courseClass.dayOfWeek,
+      courseClass.fromPeriod,
+      courseClass.toPeriod,
+    )) {
+      (DayOfWeek day, int from, int to) => "${day.shortName}, tiết $from - $to",
+      (DayOfWeek day, int from, _) => "${day.shortName}, tiết $from",
+      (DayOfWeek day, _, _) => day.fullName,
+      _ => "Chưa có thông tin",
+    };
+
     final subtitle = [
-      'Mã học phần: ${course.id}',
       'Học kỳ: ${semester.name}',
+      'Địa điểm: ${courseClass.location ?? "chưa có"}',
+      'Thời gian: $time',
     ].join('\n');
     return ListTile(
       title: Text(title),

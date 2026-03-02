@@ -5,23 +5,28 @@ import '../../../core/database_service.dart';
 import '../domain/dao.dart';
 import '../domain/models.dart';
 
+final courseClassRepositoryProvider = FutureProvider((ref) async {
+  final db = await ref.watch(databaseProvider.future);
+  return CourseClassRepository(db: db);
+});
+
+final periodListProvider = StreamProvider((ref) async* {
+  final repo = await ref.watch(courseClassRepositoryProvider.future);
+  yield* repo.watchPeriodList();
+});
+
 /// Provides all the semesters
 final allSemesterProviders = StreamProvider((ref) async* {
   final sv = await _initService(ref);
   final stmt = sv.listSemesters();
-  await for (final semesterList in stmt.watch()) {
-    yield semesterList;
-  }
+  yield* stmt.watch();
 });
 
 /// Provides the course classes of selected semester
 final courseClassesProvider = StreamProvider((ref) async* {
-  final sv = await _initService(ref);
+  final repo = await ref.watch(courseClassRepositoryProvider.future);
   final semester = ref.watch(SemesterNotifier.provider);
-  final stmt = sv.getCourseClasses(semester: semester);
-  await for (final courseClassList in stmt.watch()) {
-    yield courseClassList;
-  }
+  yield* repo.watchCourseClassData(semester: semester);
 });
 
 /// Shorthand to not having to type out the below

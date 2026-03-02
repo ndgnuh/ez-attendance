@@ -2,14 +2,10 @@
 library;
 
 import '../core/database_service.dart';
-import 'providers/database.dart';
 import 'package:riverpod/riverpod.dart';
-import '../../core/database/database.dart';
 import 'package:drift/drift.dart';
 
-export 'providers/database.dart';
 export 'providers/courses.dart';
-export 'providers/local_preferences.dart';
 
 final courseClassProvider = AsyncNotifierProvider.family(
   CourseClassNotifier.new,
