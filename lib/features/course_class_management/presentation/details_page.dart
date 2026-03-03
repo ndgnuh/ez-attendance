@@ -1,3 +1,4 @@
+import 'package:checkin_tool/features/course_class_management/presentation/period_tile.dart';
 import 'package:checkin_tool/features/course_class_management/presentation/widgets/export_button.dart';
 import 'package:checkin_tool/features/course_class_management/presentation/widgets/location_edit_tile.dart';
 import 'package:flutter/material.dart';
@@ -164,14 +165,8 @@ class _GeneralInfoTab extends ConsumerWidget {
     final scheduleInfo = [
       LocationEditTile(courseClassId: id),
       DayOfWeekTile(courseClassId: id),
-      ListTile(
-        title: Text("Tiết bắt đầu"),
-        subtitle: Text('${courseClass?.fromPeriod}'),
-      ),
-      ListTile(
-        title: Text("Tiết kết thúc"),
-        subtitle: Text('${courseClass?.toPeriod}'),
-      ),
+      PeriodTile(classId: id, isStartPeriod: true),
+      PeriodTile(classId: id, isStartPeriod: false),
     ];
 
     final dangerZone = [

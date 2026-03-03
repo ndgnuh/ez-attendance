@@ -10,18 +10,6 @@ final courseClassRepositoryProvider = FutureProvider((ref) async {
   return CourseClassRepository(db: db);
 });
 
-final periodListProvider = StreamProvider((ref) async* {
-  final repo = await ref.watch(courseClassRepositoryProvider.future);
-  yield* repo.watchPeriodList();
-});
-
-/// Provides all the semesters
-final allSemesterProviders = StreamProvider((ref) async* {
-  final sv = await _initService(ref);
-  final stmt = sv.listSemesters();
-  yield* stmt.watch();
-});
-
 /// Provides the course classes of selected semester
 final courseClassesProvider = StreamProvider((ref) async* {
   final repo = await ref.watch(courseClassRepositoryProvider.future);
@@ -29,11 +17,12 @@ final courseClassesProvider = StreamProvider((ref) async* {
   yield* repo.watchCourseClassData(semester: semester);
 });
 
-/// Shorthand to not having to type out the below
-Future<CourseClassManagementService> _initService(Ref ref) async {
-  final sv = await ref.watch(CourseClassManagementService.provider.future);
-  return sv;
-}
+final courseClassPeriodsProvider = StreamProvider.family(
+  (ref, int classId) async* {
+    final repo = await ref.watch(courseClassRepositoryProvider.future);
+    yield* repo.watchClassPeriods(classId);
+  },
+);
 
 class SemesterNotifier extends Notifier<SemesterData?> {
   static final provider = NotifierProvider(SemesterNotifier.new);

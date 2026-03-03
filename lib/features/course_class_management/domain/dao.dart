@@ -1,90 +1,9 @@
-import 'package:checkin_tool/core/enums.dart';
-import 'package:checkin_tool/shared/providers.dart';
 import 'package:drift/drift.dart';
 import 'package:riverpod/riverpod.dart';
 
 import '../../../core/database_service.dart';
+import '../../../core/enums.dart';
 import 'models.dart';
-
-/// Experimental class that hides all the query from riverpod.
-class CourseClassRepository {
-  final AppDatabase db;
-  const CourseClassRepository({required this.db});
-
-  /// Watch list of period
-  Stream<List<PeriodData>> watchPeriodList() {
-    final stmt = db.select(db.period);
-    stmt.orderBy([(r) => OrderingTerm.asc(r.id)]);
-    return stmt.watch();
-  }
-
-  /// Get all course classes by semester
-  Stream<List<CourseClassData>> watchCourseClassData({SemesterData? semester}) {
-    final stmt = db.select(db.courseClass);
-
-    /// Optional: filter by semester
-    switch (semester) {
-      case SemesterData semester:
-        stmt.where((r) => r.semesterId.equals(semester.id));
-    }
-
-    stmt.orderBy([
-      (r) => OrderingTerm.desc(r.semesterId),
-      (r) => OrderingTerm(expression: r.dayOfWeek),
-      (r) => OrderingTerm(expression: r.fromPeriod),
-    ]);
-    return stmt.watch();
-  }
-
-  Stream<T?> _watchClassInfoStmt<T extends Object>({
-    required int courseClassId,
-    required Expression<T> column,
-    required T? Function(TypedResult) mapper,
-  }) {
-    final stmt = db.selectOnly(db.courseClass);
-    stmt.addColumns({column});
-    stmt.where(db.courseClass.id.equals(courseClassId));
-    return stmt.map(mapper).watchSingleOrNull();
-  }
-
-  /// Watch the location of a course class
-  Stream<String?> watchClassLocation(int courseClassId) => _watchClassInfoStmt(
-    courseClassId: courseClassId,
-    column: db.courseClass.location,
-    mapper: (r) => r.read(db.courseClass.location),
-  );
-
-  /// Watch the day of week of a course class
-  Stream<DayOfWeek?> watchClassDayOfWeek(int courseClassId) {
-    final stmt = db.selectOnly(db.courseClass);
-    stmt.addColumns({db.courseClass.dayOfWeek});
-    stmt.where(db.courseClass.id.equals(courseClassId));
-    final mapped = stmt.map(
-      (r) => r.readWithConverter(db.courseClass.dayOfWeek),
-    );
-    return mapped.watchSingleOrNull();
-  }
-
-  Future<void> updateClassSchedule({
-    required int courseClassId,
-    DayOfWeek? dayOfWeek,
-  }) async {
-    final companion = CourseClassCompanion(dayOfWeek: Value(dayOfWeek));
-    final stmt = db.update(db.courseClass);
-    stmt.where((c) => c.id.equals(courseClassId));
-    stmt.write(companion);
-  }
-
-  Future<void> updateClassLocation({
-    required int courseClassId,
-    required String newLocation,
-  }) async {
-    final companion = CourseClassCompanion(location: Value(newLocation));
-    final stmt = db.update(db.courseClass);
-    stmt.where((c) => c.id.equals(courseClassId));
-    stmt.write(companion);
-  }
-}
 
 /// Service for managing course classes
 class CourseClassManagementService {
@@ -96,15 +15,6 @@ class CourseClassManagementService {
   final AppDatabase db;
 
   CourseClassManagementService({required this.db});
-
-  /// List all the semesters in a descend order.
-  Selectable<SemesterData> listSemesters() {
-    final stmt = db.select(db.semester);
-    stmt.orderBy([
-      (semester) => OrderingTerm.desc(semester.name),
-    ]);
-    return stmt;
-  }
 
   /// Delete course class, along with all
   /// the registration and attendance session
@@ -228,5 +138,118 @@ class CourseClassManagementService {
 
       return courseClassId;
     });
+  }
+}
+
+/// Experimental class that hides all the query from riverpod.
+class CourseClassRepository {
+  final AppDatabase db;
+  const CourseClassRepository({required this.db});
+
+  Future<void> updateClassLocation({
+    required int courseClassId,
+    required String newLocation,
+  }) async {
+    final companion = CourseClassCompanion(location: Value(newLocation));
+    final stmt = db.update(db.courseClass);
+    stmt.where((c) => c.id.equals(courseClassId));
+    stmt.write(companion);
+  }
+
+  Future<void> updateClassSchedule({
+    required int courseClassId,
+    DayOfWeek? dayOfWeek,
+  }) async {
+    final companion = CourseClassCompanion(dayOfWeek: Value(dayOfWeek));
+    final stmt = db.update(db.courseClass);
+    stmt.where((c) => c.id.equals(courseClassId));
+    stmt.write(companion);
+  }
+
+  /// Watch the day of week of a course class
+  Stream<DayOfWeek?> watchClassDayOfWeek(int courseClassId) {
+    final stmt = db.selectOnly(db.courseClass);
+    stmt.addColumns({db.courseClass.dayOfWeek});
+    stmt.where(db.courseClass.id.equals(courseClassId));
+    final mapped = stmt.map(
+      (r) => r.readWithConverter(db.courseClass.dayOfWeek),
+    );
+    return mapped.watchSingleOrNull();
+  }
+
+  /// Watch the location of a course class
+  Stream<String?> watchClassLocation(int courseClassId) => _watchClassInfoStmt(
+    courseClassId: courseClassId,
+    column: db.courseClass.location,
+    mapper: (r) => r.read(db.courseClass.location),
+  );
+
+  /// Get all course classes by semester
+  Stream<List<CourseClassData>> watchCourseClassData({SemesterData? semester}) {
+    final stmt = db.select(db.courseClass);
+
+    /// Optional: filter by semester
+    switch (semester) {
+      case SemesterData semester:
+        stmt.where((r) => r.semesterId.equals(semester.id));
+    }
+
+    stmt.orderBy([
+      (r) => OrderingTerm.desc(r.semesterId),
+      (r) => OrderingTerm(expression: r.dayOfWeek),
+      (r) => OrderingTerm(expression: r.fromPeriod),
+    ]);
+    return stmt.watch();
+  }
+
+  Stream<T?> _watchClassInfoStmt<T extends Object>({
+    required int courseClassId,
+    required Expression<T> column,
+    required T? Function(TypedResult) mapper,
+  }) {
+    final stmt = db.selectOnly(db.courseClass);
+    stmt.addColumns({column});
+    stmt.where(db.courseClass.id.equals(courseClassId));
+    return stmt.map(mapper).watchSingleOrNull();
+  }
+
+  /// Period data of a class
+  Stream<(PeriodData?, PeriodData?)?> watchClassPeriods(
+    int courseClassId,
+  ) {
+    // table aliases
+    final startP = db.alias(db.period, "start_period");
+    final endP = db.alias(db.period, "end_period");
+
+    // Join and filter
+    final stmt = db.select(db.courseClass).join([
+      leftOuterJoin(startP, startP.id.equalsExp(db.courseClass.fromPeriod)),
+      leftOuterJoin(endP, endP.id.equalsExp(db.courseClass.toPeriod)),
+    ]);
+    stmt.where(db.courseClass.id.equals(courseClassId));
+
+    // Map to return type
+    final mapped = stmt.map((r) {
+      final startPeriod = r.readTableOrNull(startP);
+      final endPeriod = r.readTableOrNull(endP);
+      return (startPeriod, endPeriod);
+    });
+
+    return mapped.watchSingleOrNull();
+  }
+
+  Future<void> updateClassPeriods({
+    required final int classId,
+    final PeriodData? startPeriod,
+    final PeriodData? endPeriod,
+  }) async {
+    assert(startPeriod != null || endPeriod != null);
+    final stmt = db.update(db.courseClass);
+    stmt.where((r) => r.id.equals(classId));
+    if (startPeriod != null) {
+      stmt.write(CourseClassCompanion(fromPeriod: Value(startPeriod.id)));
+    } else if (endPeriod != null) {
+      stmt.write(CourseClassCompanion(toPeriod: Value(endPeriod.id)));
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../shared/repository.dart';
 import '../providers.dart';
 
 class SemesterPicker extends ConsumerWidget {
@@ -9,7 +10,7 @@ class SemesterPicker extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final semestersAsync = ref.watch(allSemesterProviders);
+    final semestersAsync = ref.watch(semesterListProvider);
     switch (semestersAsync) {
       case AsyncLoading():
         return LinearProgressIndicator();
