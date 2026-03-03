@@ -251,7 +251,15 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
     sheet.setDefaultRowHeight(18);
   }
 
+  final sessionById = data.sessionById;
   buildSheet(attendanceSheet, (attendance) {
+    // Ignored
+    final ignoreAttendance =
+        sessionById[attendance.sessionId]?.ignoreAttendance ?? false;
+    if (ignoreAttendance) {
+      return TextCellValue("N/A");
+    }
+
     final attendanceText = switch (attendance.attendanceStatus) {
       AttendanceStatus.unknown => "?",
       AttendanceStatus.present => "Có",

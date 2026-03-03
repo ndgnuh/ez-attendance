@@ -2,6 +2,8 @@
 /// Export [AttendanceSessionListView] widget.
 library;
 
+import 'package:checkin_tool/core/database_service.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,19 +55,33 @@ class AttendanceSessionListView extends ConsumerWidget {
       itemBuilder: (context, idx) {
         final router = AppRouter(context);
         final session = sessionList[idx];
-        final title = "Buổi học ${_dateFormat.format(session.startTime)}";
+        if (session.ignoreAttendance) {}
+        final titleAst = session.ignoreAttendance ? " [*]" : "";
+        final title =
+            "Buổi học ${_dateFormat.format(session.startTime)} $titleAst";
         final startTime = session.startTime;
         final endTime = session.endTime;
 
-        final startFmt = DateFormat("dd/MM/yyyy, HH:mm");
-        final endFmt = DateFormat("HH:mm");
+        final timeFormat = DateFormat("HH:mm");
         final subtitle =
-            "Ngày ${startFmt.format(startTime)} - ${endFmt.format(endTime)}";
+            "Thời gian ${timeFormat.format(startTime)} - ${timeFormat.format(endTime)}";
+
         return ListTile(
           title: Text(title),
           subtitle: Text(subtitle),
           trailing: Icon(Symbols.chevron_forward),
           onTap: () => router.toAttendanceSessionStudentListPage(session.id),
+          onLongPress: () async {
+            // TODO: move to DAO layer.
+            final db = await ref.watch(databaseProvider.future);
+            final stmt = db.update(db.session);
+            stmt.where((r) => r.id.equals(session.id));
+            stmt.write(
+              SessionCompanion(
+                ignoreAttendance: Value(!session.ignoreAttendance),
+              ),
+            );
+          },
         );
       },
     );
