@@ -17,6 +17,7 @@ import './database.steps.dart';
 
 export './classes_dao.dart';
 export './semester_dao.dart';
+export './extensions.dart';
 
 part 'database.g.dart';
 
@@ -124,8 +125,36 @@ class AppDatabase extends _$AppDatabase {
           // migrator.dropColumn(schema.courseClass, "toPeriod");
           // migrator.addColumn(schema.courseClass, Text)
         },
+
+        /// Version 3:
+        /// Add ignoreAttendance to the session
         from2To3: (migrator, schema) async {
           migrator.addColumn(schema.session, schema.session.ignoreAttendance);
+        },
+
+        /// Version 4:
+        /// Add start_time and end_time column, remove the date column
+        /// start_time and end_time should be in the same day, this logic is controlled by
+        /// the client. By default, the user select a start and end period.
+        ///
+        /// However, period time table can change, and class can start at awkward time.
+        /// The user can input manual date, time for the session.
+        from3To4: (migrator, schema) async {
+          await migrator.renameColumn(
+            schema.session,
+            "date",
+            schema.session.startTime,
+          );
+          await migrator.addColumn(schema.session, schema.session.endTime);
+        },
+
+        /// Version 5:
+        /// Re-adding end_time due to erroneous column definition in the previous migration
+        from4To5: (migrator, schema) async {
+          // await migrator.addColumn(schema.session, schema.session.endTime);
+          await customUpdate(
+            "UPDATE session SET end_time = start_time WHERE end_time IS NULL",
+          );
         },
       ),
       beforeOpen: (details) async {
@@ -142,7 +171,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 5;
 
   SimpleSelectStatement<Course, CourseData> searchCourse({
     String? id,

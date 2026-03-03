@@ -1356,17 +1356,51 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
       'REFERENCES course_class (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
-  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  static const VerificationMeta _startTimeMeta = const VerificationMeta(
+    'startTime',
+  );
   @override
-  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
-    'date',
+  late final GeneratedColumn<DateTime> startTime = GeneratedColumn<DateTime>(
+    'start_time',
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _endTimeMeta = const VerificationMeta(
+    'endTime',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, courseClassId, date];
+  late final GeneratedColumn<DateTime> endTime = GeneratedColumn<DateTime>(
+    'end_time',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ignoreAttendanceMeta = const VerificationMeta(
+    'ignoreAttendance',
+  );
+  @override
+  late final GeneratedColumn<bool> ignoreAttendance = GeneratedColumn<bool>(
+    'ignore_attendance',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("ignore_attendance" IN (0, 1))',
+    ),
+    clientDefault: () => false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    courseClassId,
+    startTime,
+    endTime,
+    ignoreAttendance,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1393,13 +1427,30 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
     } else if (isInserting) {
       context.missing(_courseClassIdMeta);
     }
-    if (data.containsKey('date')) {
+    if (data.containsKey('start_time')) {
       context.handle(
-        _dateMeta,
-        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+        _startTimeMeta,
+        startTime.isAcceptableOrUnknown(data['start_time']!, _startTimeMeta),
       );
     } else if (isInserting) {
-      context.missing(_dateMeta);
+      context.missing(_startTimeMeta);
+    }
+    if (data.containsKey('end_time')) {
+      context.handle(
+        _endTimeMeta,
+        endTime.isAcceptableOrUnknown(data['end_time']!, _endTimeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endTimeMeta);
+    }
+    if (data.containsKey('ignore_attendance')) {
+      context.handle(
+        _ignoreAttendanceMeta,
+        ignoreAttendance.isAcceptableOrUnknown(
+          data['ignore_attendance']!,
+          _ignoreAttendanceMeta,
+        ),
+      );
     }
     return context;
   }
@@ -1420,10 +1471,20 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
             DriftSqlType.int,
             data['${effectivePrefix}course_class_id'],
           )!,
-      date:
+      startTime:
           attachedDatabase.typeMapping.read(
             DriftSqlType.dateTime,
-            data['${effectivePrefix}date'],
+            data['${effectivePrefix}start_time'],
+          )!,
+      endTime:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}end_time'],
+          )!,
+      ignoreAttendance:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}ignore_attendance'],
           )!,
     );
   }
@@ -1437,18 +1498,24 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
 class SessionData extends DataClass implements Insertable<SessionData> {
   final int id;
   final int courseClassId;
-  final DateTime date;
+  final DateTime startTime;
+  final DateTime endTime;
+  final bool ignoreAttendance;
   const SessionData({
     required this.id,
     required this.courseClassId,
-    required this.date,
+    required this.startTime,
+    required this.endTime,
+    required this.ignoreAttendance,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['course_class_id'] = Variable<int>(courseClassId);
-    map['date'] = Variable<DateTime>(date);
+    map['start_time'] = Variable<DateTime>(startTime);
+    map['end_time'] = Variable<DateTime>(endTime);
+    map['ignore_attendance'] = Variable<bool>(ignoreAttendance);
     return map;
   }
 
@@ -1456,7 +1523,9 @@ class SessionData extends DataClass implements Insertable<SessionData> {
     return SessionCompanion(
       id: Value(id),
       courseClassId: Value(courseClassId),
-      date: Value(date),
+      startTime: Value(startTime),
+      endTime: Value(endTime),
+      ignoreAttendance: Value(ignoreAttendance),
     );
   }
 
@@ -1468,7 +1537,9 @@ class SessionData extends DataClass implements Insertable<SessionData> {
     return SessionData(
       id: serializer.fromJson<int>(json['id']),
       courseClassId: serializer.fromJson<int>(json['courseClassId']),
-      date: serializer.fromJson<DateTime>(json['date']),
+      startTime: serializer.fromJson<DateTime>(json['startTime']),
+      endTime: serializer.fromJson<DateTime>(json['endTime']),
+      ignoreAttendance: serializer.fromJson<bool>(json['ignoreAttendance']),
     );
   }
   @override
@@ -1477,16 +1548,25 @@ class SessionData extends DataClass implements Insertable<SessionData> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'courseClassId': serializer.toJson<int>(courseClassId),
-      'date': serializer.toJson<DateTime>(date),
+      'startTime': serializer.toJson<DateTime>(startTime),
+      'endTime': serializer.toJson<DateTime>(endTime),
+      'ignoreAttendance': serializer.toJson<bool>(ignoreAttendance),
     };
   }
 
-  SessionData copyWith({int? id, int? courseClassId, DateTime? date}) =>
-      SessionData(
-        id: id ?? this.id,
-        courseClassId: courseClassId ?? this.courseClassId,
-        date: date ?? this.date,
-      );
+  SessionData copyWith({
+    int? id,
+    int? courseClassId,
+    DateTime? startTime,
+    DateTime? endTime,
+    bool? ignoreAttendance,
+  }) => SessionData(
+    id: id ?? this.id,
+    courseClassId: courseClassId ?? this.courseClassId,
+    startTime: startTime ?? this.startTime,
+    endTime: endTime ?? this.endTime,
+    ignoreAttendance: ignoreAttendance ?? this.ignoreAttendance,
+  );
   SessionData copyWithCompanion(SessionCompanion data) {
     return SessionData(
       id: data.id.present ? data.id.value : this.id,
@@ -1494,7 +1574,12 @@ class SessionData extends DataClass implements Insertable<SessionData> {
           data.courseClassId.present
               ? data.courseClassId.value
               : this.courseClassId,
-      date: data.date.present ? data.date.value : this.date,
+      startTime: data.startTime.present ? data.startTime.value : this.startTime,
+      endTime: data.endTime.present ? data.endTime.value : this.endTime,
+      ignoreAttendance:
+          data.ignoreAttendance.present
+              ? data.ignoreAttendance.value
+              : this.ignoreAttendance,
     );
   }
 
@@ -1503,58 +1588,78 @@ class SessionData extends DataClass implements Insertable<SessionData> {
     return (StringBuffer('SessionData(')
           ..write('id: $id, ')
           ..write('courseClassId: $courseClassId, ')
-          ..write('date: $date')
+          ..write('startTime: $startTime, ')
+          ..write('endTime: $endTime, ')
+          ..write('ignoreAttendance: $ignoreAttendance')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, courseClassId, date);
+  int get hashCode =>
+      Object.hash(id, courseClassId, startTime, endTime, ignoreAttendance);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is SessionData &&
           other.id == this.id &&
           other.courseClassId == this.courseClassId &&
-          other.date == this.date);
+          other.startTime == this.startTime &&
+          other.endTime == this.endTime &&
+          other.ignoreAttendance == this.ignoreAttendance);
 }
 
 class SessionCompanion extends UpdateCompanion<SessionData> {
   final Value<int> id;
   final Value<int> courseClassId;
-  final Value<DateTime> date;
+  final Value<DateTime> startTime;
+  final Value<DateTime> endTime;
+  final Value<bool> ignoreAttendance;
   const SessionCompanion({
     this.id = const Value.absent(),
     this.courseClassId = const Value.absent(),
-    this.date = const Value.absent(),
+    this.startTime = const Value.absent(),
+    this.endTime = const Value.absent(),
+    this.ignoreAttendance = const Value.absent(),
   });
   SessionCompanion.insert({
     this.id = const Value.absent(),
     required int courseClassId,
-    required DateTime date,
+    required DateTime startTime,
+    required DateTime endTime,
+    this.ignoreAttendance = const Value.absent(),
   }) : courseClassId = Value(courseClassId),
-       date = Value(date);
+       startTime = Value(startTime),
+       endTime = Value(endTime);
   static Insertable<SessionData> custom({
     Expression<int>? id,
     Expression<int>? courseClassId,
-    Expression<DateTime>? date,
+    Expression<DateTime>? startTime,
+    Expression<DateTime>? endTime,
+    Expression<bool>? ignoreAttendance,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (courseClassId != null) 'course_class_id': courseClassId,
-      if (date != null) 'date': date,
+      if (startTime != null) 'start_time': startTime,
+      if (endTime != null) 'end_time': endTime,
+      if (ignoreAttendance != null) 'ignore_attendance': ignoreAttendance,
     });
   }
 
   SessionCompanion copyWith({
     Value<int>? id,
     Value<int>? courseClassId,
-    Value<DateTime>? date,
+    Value<DateTime>? startTime,
+    Value<DateTime>? endTime,
+    Value<bool>? ignoreAttendance,
   }) {
     return SessionCompanion(
       id: id ?? this.id,
       courseClassId: courseClassId ?? this.courseClassId,
-      date: date ?? this.date,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      ignoreAttendance: ignoreAttendance ?? this.ignoreAttendance,
     );
   }
 
@@ -1567,8 +1672,14 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
     if (courseClassId.present) {
       map['course_class_id'] = Variable<int>(courseClassId.value);
     }
-    if (date.present) {
-      map['date'] = Variable<DateTime>(date.value);
+    if (startTime.present) {
+      map['start_time'] = Variable<DateTime>(startTime.value);
+    }
+    if (endTime.present) {
+      map['end_time'] = Variable<DateTime>(endTime.value);
+    }
+    if (ignoreAttendance.present) {
+      map['ignore_attendance'] = Variable<bool>(ignoreAttendance.value);
     }
     return map;
   }
@@ -1578,7 +1689,9 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
     return (StringBuffer('SessionCompanion(')
           ..write('id: $id, ')
           ..write('courseClassId: $courseClassId, ')
-          ..write('date: $date')
+          ..write('startTime: $startTime, ')
+          ..write('endTime: $endTime, ')
+          ..write('ignoreAttendance: $ignoreAttendance')
           ..write(')'))
         .toString();
   }
@@ -4134,13 +4247,17 @@ typedef $$SessionTableCreateCompanionBuilder =
     SessionCompanion Function({
       Value<int> id,
       required int courseClassId,
-      required DateTime date,
+      required DateTime startTime,
+      required DateTime endTime,
+      Value<bool> ignoreAttendance,
     });
 typedef $$SessionTableUpdateCompanionBuilder =
     SessionCompanion Function({
       Value<int> id,
       Value<int> courseClassId,
-      Value<DateTime> date,
+      Value<DateTime> startTime,
+      Value<DateTime> endTime,
+      Value<bool> ignoreAttendance,
     });
 
 final class $$SessionTableReferences
@@ -4199,8 +4316,18 @@ class $$SessionTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get date => $composableBuilder(
-    column: $table.date,
+  ColumnFilters<DateTime> get startTime => $composableBuilder(
+    column: $table.startTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endTime => $composableBuilder(
+    column: $table.endTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get ignoreAttendance => $composableBuilder(
+    column: $table.ignoreAttendance,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4267,8 +4394,18 @@ class $$SessionTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get date => $composableBuilder(
-    column: $table.date,
+  ColumnOrderings<DateTime> get startTime => $composableBuilder(
+    column: $table.startTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endTime => $composableBuilder(
+    column: $table.endTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get ignoreAttendance => $composableBuilder(
+    column: $table.ignoreAttendance,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4308,8 +4445,16 @@ class $$SessionTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get date =>
-      $composableBuilder(column: $table.date, builder: (column) => column);
+  GeneratedColumn<DateTime> get startTime =>
+      $composableBuilder(column: $table.startTime, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endTime =>
+      $composableBuilder(column: $table.endTime, builder: (column) => column);
+
+  GeneratedColumn<bool> get ignoreAttendance => $composableBuilder(
+    column: $table.ignoreAttendance,
+    builder: (column) => column,
+  );
 
   $$CourseClassTableAnnotationComposer get courseClassId {
     final $$CourseClassTableAnnotationComposer composer = $composerBuilder(
@@ -4390,21 +4535,29 @@ class $$SessionTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> courseClassId = const Value.absent(),
-                Value<DateTime> date = const Value.absent(),
+                Value<DateTime> startTime = const Value.absent(),
+                Value<DateTime> endTime = const Value.absent(),
+                Value<bool> ignoreAttendance = const Value.absent(),
               }) => SessionCompanion(
                 id: id,
                 courseClassId: courseClassId,
-                date: date,
+                startTime: startTime,
+                endTime: endTime,
+                ignoreAttendance: ignoreAttendance,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required int courseClassId,
-                required DateTime date,
+                required DateTime startTime,
+                required DateTime endTime,
+                Value<bool> ignoreAttendance = const Value.absent(),
               }) => SessionCompanion.insert(
                 id: id,
                 courseClassId: courseClassId,
-                date: date,
+                startTime: startTime,
+                endTime: endTime,
+                ignoreAttendance: ignoreAttendance,
               ),
           withReferenceMapper:
               (p0) =>

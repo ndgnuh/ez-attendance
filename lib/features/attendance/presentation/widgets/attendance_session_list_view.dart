@@ -53,7 +53,7 @@ class AttendanceSessionListView extends ConsumerWidget {
       itemBuilder: (context, idx) {
         final router = AppRouter(context);
         final session = sessionList[idx];
-        final title = "Buổi học ${_dateFormat.format(session.date)}";
+        final title = "Buổi học ${_dateFormat.format(session.startTime)}";
         return ListTile(
           title: Text(title),
           subtitle: Text("Xem chi tiết"),

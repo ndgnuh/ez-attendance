@@ -55,7 +55,7 @@ final attendanceSessionListProvider = StreamProvider.family(
     stmt.where((row) => row.courseClassId.equals(courseClassId));
     stmt.orderBy([
       (row) => OrderingTerm.asc(row.courseClassId),
-      (row) => OrderingTerm.desc(row.date),
+      (row) => OrderingTerm.desc(row.startTime),
     ]);
 
     await for (final sessions in stmt.watch()) {

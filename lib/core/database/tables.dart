@@ -127,7 +127,8 @@ class Session extends Table {
         onUpdate: KeyAction.cascade,
         onDelete: KeyAction.cascade,
       )();
-  DateTimeColumn get date => dateTime()();
+  DateTimeColumn get startTime => dateTime()();
+  DateTimeColumn get endTime => dateTime()();
   BoolColumn get ignoreAttendance => boolean().clientDefault(() => false)();
 }
 

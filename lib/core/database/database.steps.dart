@@ -563,9 +563,276 @@ i1.GeneratedColumn<int> _column_24(String aliasedName) =>
       type: i1.DriftSqlType.int,
       $customConstraints: 'NOT NULL CHECK (ignore_attendance IN (0, 1))',
     );
+
+final class Schema4 extends i0.VersionedSchema {
+  Schema4({required super.database}) : super(version: 4);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    course,
+    period,
+    semester,
+    courseClass,
+    session,
+    student,
+    attendance,
+    registration,
+  ];
+  late final Shape0 course = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'course',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [_column_0, _column_1, _column_2],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape1 period = Shape1(
+    source: i0.VersionedTable(
+      entityName: 'period',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [_column_3, _column_4, _column_5, _column_6, _column_7],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 semester = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'semester',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [_column_8, _column_1],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 courseClass = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'course_class',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_14,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape9 session = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'session',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [_column_8, _column_16, _column_25, _column_26, _column_24],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 student = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'student',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [_column_0, _column_18, _column_1, _column_19, _column_2],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 attendance = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'attendance',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(session_id, student_id)'],
+      columns: [_column_20, _column_21, _column_22, _column_23],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 registration = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'registration',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(course_class_id, student_id)'],
+      columns: [_column_16, _column_23],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+}
+
+class Shape9 extends i0.VersionedTable {
+  Shape9({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<int> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get courseClassId =>
+      columnsByName['course_class_id']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get startTime =>
+      columnsByName['start_time']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get endTime =>
+      columnsByName['end_time']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get ignoreAttendance =>
+      columnsByName['ignore_attendance']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<int> _column_25(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'start_time',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_26(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'end_time',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT (start_time)',
+      defaultValue: const i1.CustomExpression('start_time'),
+    );
+
+final class Schema5 extends i0.VersionedSchema {
+  Schema5({required super.database}) : super(version: 5);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    course,
+    period,
+    semester,
+    courseClass,
+    session,
+    student,
+    attendance,
+    registration,
+  ];
+  late final Shape0 course = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'course',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [_column_0, _column_1, _column_2],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape1 period = Shape1(
+    source: i0.VersionedTable(
+      entityName: 'period',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [_column_3, _column_4, _column_5, _column_6, _column_7],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 semester = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'semester',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [_column_8, _column_1],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 courseClass = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'course_class',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_14,
+        _column_15,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape9 session = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'session',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [],
+      columns: [_column_8, _column_16, _column_25, _column_27, _column_24],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 student = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'student',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [_column_0, _column_18, _column_1, _column_19, _column_2],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 attendance = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'attendance',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(session_id, student_id)'],
+      columns: [_column_20, _column_21, _column_22, _column_23],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 registration = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'registration',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(course_class_id, student_id)'],
+      columns: [_column_16, _column_23],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+}
+
+i1.GeneratedColumn<int> _column_27(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'end_time',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
+  required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
+  required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -579,6 +846,16 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from2To3(migrator, schema);
         return 3;
+      case 3:
+        final schema = Schema4(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from3To4(migrator, schema);
+        return 4;
+      case 4:
+        final schema = Schema5(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from4To5(migrator, schema);
+        return 5;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -588,6 +865,13 @@ i0.MigrationStepWithVersion migrationSteps({
 i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
+  required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
+  required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
 }) => i0.VersionedSchema.stepByStepHelper(
-  step: migrationSteps(from1To2: from1To2, from2To3: from2To3),
+  step: migrationSteps(
+    from1To2: from1To2,
+    from2To3: from2To3,
+    from3To4: from3To4,
+    from4To5: from4To5,
+  ),
 );

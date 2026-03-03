@@ -115,7 +115,7 @@ final _sessionsProvider = StreamProvider.family(
     final stmt = db.select(db.session)..where((row) {
       return row.courseClassId.equals(courseClassId);
     });
-    stmt.orderBy([(session) => OrderingTerm.asc(db.session.date)]);
+    stmt.orderBy([(session) => OrderingTerm.asc(db.session.startTime)]);
 
     await for (final sessions in stmt.watch()) {
       yield sessions;
@@ -179,7 +179,8 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
     final headerTexts = [
       "MSSV",
       "Họ và tên",
-      for (final session in data.sessionList) dateFormat.format(session.date),
+      for (final session in data.sessionList)
+        dateFormat.format(session.startTime),
     ];
 
     /// Write header row

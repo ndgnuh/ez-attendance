@@ -1,6 +1,6 @@
+/// TODO: merge with class management
 import 'package:flutter/material.dart';
 
-import '../../../../core/database_service.dart';
 import '../../domain/dao.dart';
 
 class AttendanceSessionCreateButton extends StatelessWidget {
@@ -68,6 +68,7 @@ Future<void> _showAttendanceSessionCreationDialog({
   );
   return await db.createAttendanceSession(
     courseClassId: courseClassId,
-    datetime: datetime,
+    startTime: datetime,
+    endTime: datetime,
   );
 }

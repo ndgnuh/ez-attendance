@@ -13,7 +13,7 @@ extension Dao on AppDatabase {
     stmt.where((r) => r.courseClassId.equals(courseClassId));
     stmt.orderBy([
       (row) => OrderingTerm.asc(row.courseClassId),
-      (row) => OrderingTerm.desc(row.date),
+      (row) => OrderingTerm.desc(row.startTime),
     ]);
     return stmt;
   }
@@ -23,11 +23,13 @@ extension Dao on AppDatabase {
   /// The default attendance status is [absent]
   Future<Null> createAttendanceSession({
     required int courseClassId,
-    required DateTime datetime,
+    required DateTime startTime,
+    required DateTime endTime,
   }) async {
     final sessionItem = SessionCompanion.insert(
       courseClassId: courseClassId,
-      date: datetime,
+      startTime: startTime,
+      endTime: endTime,
     );
 
     final studentsSelect = getClassStudentList(id: courseClassId);
