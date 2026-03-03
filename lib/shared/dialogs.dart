@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/database_service.dart';
 import 'context.dart';
+import 'repository.dart';
 
 /// Show a dialog to confirm user actions
 Future<bool> showConfirmationDialog({
@@ -120,5 +123,59 @@ class ConfirmationDialog extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class PeriodSelectionDialog extends ConsumerWidget {
+  final String titleText;
+
+  /// Show period selection dialog
+  static Future<T?> show<T>({
+    required String titleText,
+    BuildContext? context,
+  }) async {
+    return await showDialog<T?>(
+      context: context ?? navigationKey.currentContext!,
+      builder: (context) => PeriodSelectionDialog(titleText: titleText),
+    );
+  }
+
+  const PeriodSelectionDialog({super.key, required this.titleText});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final periodsAsync = ref.watch(periodListProvider);
+
+    return SimpleDialog(
+      title: Text(titleText),
+      children: buildChildren(context, periodsAsync),
+    );
+  }
+
+  List<Widget> buildChildren(
+    BuildContext context,
+    AsyncValue<List<PeriodData>> periodsAsync,
+  ) {
+    final navigator = Navigator.of(context);
+    switch (periodsAsync) {
+      case AsyncLoading():
+        return [CircularProgressIndicator()];
+
+      case AsyncError(:final error, :final stackTrace):
+        print(stackTrace);
+        return [Text(error.toString())];
+
+      case AsyncData(value: final periods):
+        return [
+          for (final period in periods)
+            ListTile(
+              title: Text("Tiết ${period.id}"),
+              subtitle: Text(
+                "${period.startTime.format(context)} - ${period.endTime.format(context)}",
+              ),
+              onTap: () => navigator.pop(period),
+            ),
+        ];
+    }
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/database_service.dart';
-import '../../../shared/repository.dart';
+import '../../../shared/dialogs.dart';
 import 'providers.dart';
 
 class PeriodTile extends ConsumerWidget {
@@ -62,14 +62,14 @@ class PeriodTile extends ConsumerWidget {
           title: title,
           subtitle: Text(subtitleText),
           onTap: () async {
-            final newValue = await showDialog(
-              context: context,
-              builder:
-                  (context) => _PeriodSelectionDialog(titleText: titleText),
+            final newValue = await PeriodSelectionDialog.show(
+              titleText: titleText,
             );
+
             final repo = await ref.read(
               courseClassRepositoryProvider.future,
             );
+
             if (isStartPeriod) {
               repo.updateClassPeriods(classId: classId, startPeriod: newValue);
             } else {
@@ -77,49 +77,6 @@ class PeriodTile extends ConsumerWidget {
             }
           },
         );
-    }
-  }
-}
-
-class _PeriodSelectionDialog extends ConsumerWidget {
-  final String titleText;
-
-  const _PeriodSelectionDialog({required this.titleText});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final periodsAsync = ref.watch(periodListProvider);
-
-    return SimpleDialog(
-      title: Text(titleText),
-      children: buildChildren(context, periodsAsync),
-    );
-  }
-
-  List<Widget> buildChildren(
-    BuildContext context,
-    AsyncValue<List<PeriodData>> periodsAsync,
-  ) {
-    final navigator = Navigator.of(context);
-    switch (periodsAsync) {
-      case AsyncLoading():
-        return [CircularProgressIndicator()];
-
-      case AsyncError(:final error, :final stackTrace):
-        print(stackTrace);
-        return [Text(error.toString())];
-
-      case AsyncData(value: final periods):
-        return [
-          for (final period in periods)
-            ListTile(
-              title: Text("Tiết ${period.id}"),
-              subtitle: Text(
-                "${period.startTime.format(context)} - ${period.endTime.format(context)}",
-              ),
-              onTap: () => navigator.pop(period),
-            ),
-        ];
     }
   }
 }

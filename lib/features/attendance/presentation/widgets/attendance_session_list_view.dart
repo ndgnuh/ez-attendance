@@ -54,14 +54,18 @@ class AttendanceSessionListView extends ConsumerWidget {
         final router = AppRouter(context);
         final session = sessionList[idx];
         final title = "Buổi học ${_dateFormat.format(session.startTime)}";
+        final startTime = session.startTime;
+        final endTime = session.endTime;
+
+        final startFmt = DateFormat("dd/MM/yyyy, HH:mm");
+        final endFmt = DateFormat("HH:mm");
+        final subtitle =
+            "Ngày ${startFmt.format(startTime)} - ${endFmt.format(endTime)}";
         return ListTile(
           title: Text(title),
-          subtitle: Text("Xem chi tiết"),
+          subtitle: Text(subtitle),
           trailing: Icon(Symbols.chevron_forward),
-          onTap:
-              () => router.toAttendanceSessionStudentListPage(
-                session.id,
-              ),
+          onTap: () => router.toAttendanceSessionStudentListPage(session.id),
         );
       },
     );

@@ -28,3 +28,6 @@ linter:
 # https://dart.dev/guides/language/analysis-options
 formatter:
   trailing_commas: preserve
+analyzer:
+  errors:
+    avoid_print: ignore

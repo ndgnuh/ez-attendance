@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../attendance/attendance.dart';
+import '../../attendance/presentation/widgets/attendance_session_list_view.dart';
+import '../../attendance/presentation/widgets/session_create_button.dart';
 
 class AttendanceSessionListPage extends StatelessWidget {
   final int courseClassId;
