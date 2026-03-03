@@ -128,6 +128,7 @@ class Session extends Table {
         onDelete: KeyAction.cascade,
       )();
   DateTimeColumn get date => dateTime()();
+  BoolColumn get ignoreAttendance => boolean().clientDefault(() => false)();
 }
 
 class Student extends Table {

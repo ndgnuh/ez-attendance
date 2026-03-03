@@ -124,6 +124,9 @@ class AppDatabase extends _$AppDatabase {
           // migrator.dropColumn(schema.courseClass, "toPeriod");
           // migrator.addColumn(schema.courseClass, Text)
         },
+        from2To3: (migrator, schema) async {
+          migrator.addColumn(schema.session, schema.session.ignoreAttendance);
+        },
       ),
       beforeOpen: (details) async {
         if (details.hadUpgrade || details.wasCreated) {
@@ -139,7 +142,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   SimpleSelectStatement<Course, CourseData> searchCourse({
     String? id,
