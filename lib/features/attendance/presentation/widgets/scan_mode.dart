@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-import '../../../../core/database_service.dart';
-import '../../../../core/enums.dart';
 import '../../../../core/router.dart';
 import '../../domain/dao.dart';
 import '../../domain/data_model.dart';
@@ -115,20 +115,70 @@ class _AttendanceScannerState extends State<AttendanceScanner> {
 class AttendanceScanModePicker extends ConsumerWidget {
   const AttendanceScanModePicker({super.key});
 
+  IconData iconForScanMode(ScanningMode mode) {
+    return switch (mode) {
+      ScanningMode.markAttend => Symbols.check_circle,
+      ScanningMode.markLate => Symbols.history_toggle_off,
+      ScanningMode.markContributed => Symbols.assignment_turned_in,
+    };
+  }
+
+  Color fgForScanMode(ColorScheme scheme, ScanningMode mode) {
+    return switch (mode) {
+      ScanningMode.markAttend => scheme.primary,
+      ScanningMode.markContributed => scheme.tertiary,
+      ScanningMode.markLate => scheme.error,
+    };
+  }
+
+  Color bgForScanMode(ColorScheme scheme, ScanningMode mode) {
+    return switch (mode) {
+      ScanningMode.markAttend => scheme.primaryContainer,
+      ScanningMode.markContributed => scheme.tertiaryContainer,
+      ScanningMode.markLate => scheme.errorContainer,
+    };
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentMode = ref.read(ScanModeNotifier.provider);
+    final scheme = ColorScheme.of(context);
+    final currentMode = ref.watch(ScanModeNotifier.provider);
+
+    final backgroundColor = bgForScanMode(scheme, currentMode);
+    final foregroundColor = fgForScanMode(scheme, currentMode);
+    final iconData = iconForScanMode(currentMode);
+    final inputBorder = UnderlineInputBorder(
+      borderSide: BorderSide(color: foregroundColor, width: 2.0),
+    );
+
     return DropdownMenu(
+      textStyle: TextStyle(color: foregroundColor, fontWeight: FontWeight.bold),
+      leadingIcon: Padding(
+        padding: EdgeInsets.symmetric(horizontal: context.gutterSmall),
+        child: Icon(iconData, color: foregroundColor, weight: 800),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: ref.watch(scanningBackgroundColorProvider),
+        fillColor: backgroundColor,
+        labelStyle: TextStyle(color: foregroundColor),
+        floatingLabelStyle: TextStyle(color: foregroundColor),
+        border: inputBorder,
+        focusedBorder: inputBorder,
+        enabledBorder: inputBorder,
       ),
-      label: Text("Chế độ"),
+      // label: Text("Chế độ"),
       expandedInsets: EdgeInsetsGeometry.zero,
       initialSelection: currentMode,
       dropdownMenuEntries: [
         for (final scanMode in ScanningMode.values)
-          DropdownMenuEntry(label: scanMode.label, value: scanMode),
+          DropdownMenuEntry(
+            label: scanMode.label,
+            value: scanMode,
+            leadingIcon: Icon(
+              iconForScanMode(scanMode),
+              color: fgForScanMode(scheme, scanMode),
+            ),
+          ),
       ],
       onSelected: (mode) {
         ref.read(ScanModeNotifier.instance).set(mode ?? currentMode);

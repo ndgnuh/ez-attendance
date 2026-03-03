@@ -101,9 +101,10 @@ class SessionDeleteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = ColorScheme.of(context);
     final ref = ProviderScope.containerOf(context);
     final navigator = Navigator.of(context);
-    return IconButton(
+    return TextButton.icon(
       onPressed: () async {
         final ok = await showConfirmationDialog(
           context: context,
@@ -116,7 +117,8 @@ class SessionDeleteButton extends StatelessWidget {
         await db.deleteAttendanceSession(sessionId);
         navigator.pop();
       },
-      icon: Icon(Symbols.delete),
+      label: Text("Xóa buổi học", style: TextStyle(color: scheme.error)),
+      icon: Icon(Symbols.delete, color: scheme.error),
     );
   }
 }

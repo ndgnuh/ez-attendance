@@ -46,9 +46,15 @@ class MyApp extends ConsumerWidget {
       inputDecoratorIsFilled: true,
       alignedDropdown: true,
       defaultRadius: context.gutterTiny,
+      useMaterial3Typography: true,
+      searchUseGlobalShape: true,
     );
 
-    final scheme = FlexScheme.deepBlue;
+    // final scheme = FlexScheme.deepBlue;
+    final scheme = FlexScheme.blue;
+    FlexScheme.blue;
+
+    final iconTheme = const IconThemeData(fill: 0.0);
 
     return MaterialApp(
       title: 'Attendance Tool',
@@ -67,12 +73,12 @@ class MyApp extends ConsumerWidget {
         scheme: scheme,
         subThemesData: subThemesData,
         keyColors: const FlexKeyColors(),
-      ),
+      ).copyWith(iconTheme: iconTheme),
       theme: FlexThemeData.light(
         scheme: scheme,
         subThemesData: subThemesData,
         keyColors: const FlexKeyColors(),
-      ),
+      ).copyWith(iconTheme: iconTheme),
       themeMode: themeMode,
       home: AppRouter(context).homePage(),
       builder:

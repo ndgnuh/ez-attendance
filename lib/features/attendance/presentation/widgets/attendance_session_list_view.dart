@@ -55,10 +55,19 @@ class AttendanceSessionListView extends ConsumerWidget {
       itemBuilder: (context, idx) {
         final router = AppRouter(context);
         final session = sessionList[idx];
-        if (session.ignoreAttendance) {}
-        final titleAst = session.ignoreAttendance ? " [*]" : "";
-        final title =
-            "Buổi học ${_dateFormat.format(session.startTime)} $titleAst";
+        final scheme = ColorScheme.of(context);
+
+        final iconData = switch (session.ignoreAttendance) {
+          true => Symbols.person_off,
+          false => Symbols.person_check,
+        };
+        final iconColor = switch (session.ignoreAttendance) {
+          true => scheme.error,
+          false => scheme.primary,
+        };
+        final leading = Icon(iconData, color: iconColor);
+
+        final title = "Buổi học ${_dateFormat.format(session.startTime)}";
         final startTime = session.startTime;
         final endTime = session.endTime;
 
@@ -67,6 +76,7 @@ class AttendanceSessionListView extends ConsumerWidget {
             "Thời gian ${timeFormat.format(startTime)} - ${timeFormat.format(endTime)}";
 
         return ListTile(
+          leading: leading,
           title: Text(title),
           subtitle: Text(subtitle),
           trailing: Icon(Symbols.chevron_forward),
