@@ -6,6 +6,29 @@ import '../core/database_service.dart';
 import 'context.dart';
 import 'repository.dart';
 
+Future<void> showAlert({
+  required String title,
+  String? description,
+  BuildContext? context,
+}) async {
+  final context_ = context ?? navigationKey.currentContext!;
+  final navigator = Navigator.of(context_);
+  await showDialog(
+    context: context_,
+    builder:
+        (context) => AlertDialog(
+          title: Text(title),
+          content: (description != null) ? Text(description) : null,
+          actions: [
+            TextButton.icon(
+              onPressed: () => navigator.pop(),
+              label: Text("Ok"),
+            ),
+          ],
+        ),
+  );
+}
+
 /// Show a dialog to confirm user actions
 Future<bool> showConfirmationDialog({
   BuildContext? context,

@@ -41,7 +41,7 @@ class AttendanceStudentListPage extends ConsumerWidget {
                 true => AttendanceScanner(sessionId: sessionId),
               },
             ),
-            if (scanMode) ScanMessage(),
+            if (scanMode) ScanClearButton(),
             IntrinsicHeight(
               child: Row(
                 spacing: context.gutter,
