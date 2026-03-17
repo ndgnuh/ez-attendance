@@ -2,6 +2,11 @@
 
 A new Flutter project.
 
+## Change log
+
+- v1.2: Better tracking of scanned codes.
+- v1.1: Add ability to export to all semester
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
