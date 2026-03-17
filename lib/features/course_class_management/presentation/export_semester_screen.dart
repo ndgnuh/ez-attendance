@@ -37,6 +37,7 @@ class ExportSemesterAttendanceScreen extends StatelessWidget {
             _ExportRunButton(),
             Divider(),
             _SaveButton(),
+            _ShareButton(),
           ],
         ),
       ),
@@ -66,7 +67,7 @@ class _ExportRunButton extends ConsumerWidget {
       _mutation.run(ref, (tsx) async {
         assert(semester != null, "Chưa chọn học kỳ");
         final provider = semesterAttendanceXlsxProvider(semester!.id).future;
-        final file = await ref.watch(provider);
+        final file = await tsx.get(provider);
         return file;
       });
     }
