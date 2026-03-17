@@ -7,6 +7,8 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:math' as math;
 
+import 'package:archive/archive.dart';
+import 'package:checkin_tool/features/course_class_management/domain/dao.dart';
 import 'package:drift/drift.dart';
 import 'package:excel/excel.dart';
 import 'package:intl/intl.dart';
@@ -18,13 +20,53 @@ import '../../attendance/domain/dao.dart';
 /// Provide the exported xlsx file for the course-class's attendance data
 final classAttendanceXlsxProvider = FutureProvider.family(
   (ref, int courseClassId) async {
+    print("#0");
     final data = await ref.watch(_exportDataProvider(courseClassId).future);
+    print("#1");
     final bytes = await Isolate.run(
       () => _buildCourseClassAttendanceXlsx(data: data),
     );
+    print("2");
     final courseClass = await ref.watch(_classProvider(courseClassId).future);
+    print("3");
     final name = "CCTC-${courseClass.classCode}";
+    print(name);
     return NamedFile(name: name, bytes: bytes, extension: "xlsx");
+  },
+);
+
+final classIdsBySemesterProvider = StreamProvider.family((
+  ref,
+  int semesterId,
+) async* {
+  final db = await ref.watch(databaseProvider.future);
+  final repo = CourseClassRepository(db: db);
+  yield* repo.watchClassIdsBySemester(semesterId: semesterId);
+});
+
+/// Provide exported xlsx file for the whole semesters
+final semesterAttendanceXlsxProvider = FutureProvider.family(
+  (Ref ref, int semesterId) async {
+    final ids = await ref.watch(classIdsBySemesterProvider(semesterId).future);
+
+    final archive = Archive();
+    for (final id in ids) {
+      print(id);
+      final xlsx = await ref.watch(classAttendanceXlsxProvider(id).future);
+      print(xlsx);
+      final file = ArchiveFile(xlsx.path, xlsx.bytes.length, xlsx.bytes);
+      archive.addFile(file);
+    }
+
+    /// Pack into a zipped file
+    final format = DateFormat("yyyy-MM-dd");
+    final name = "CCTC-${format.format(DateTime.now())}.zip";
+    final encoder = ZipEncoder();
+    final zipData = encoder.encode(archive);
+    final zipFile = NamedFile(name: name, bytes: zipData as Uint8List);
+
+    /// Yield
+    return zipFile;
   },
 );
 

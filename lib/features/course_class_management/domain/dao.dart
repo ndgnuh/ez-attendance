@@ -146,6 +146,14 @@ class CourseClassRepository {
   final AppDatabase db;
   const CourseClassRepository({required this.db});
 
+  /// List of course class ID by semester
+  Stream<List<int>> watchClassIdsBySemester({required int semesterId}) {
+    final stmt = db.select(db.courseClass);
+    stmt.where((r) => r.semesterId.equals(semesterId));
+    final mapped = stmt.map((r) => r.id);
+    return mapped.watch();
+  }
+
   Future<void> updateClassLocation({
     required int courseClassId,
     required String newLocation,

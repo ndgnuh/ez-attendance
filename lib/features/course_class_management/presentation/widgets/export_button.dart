@@ -96,7 +96,7 @@ class ShareClassAttendanceButton extends ConsumerWidget {
               files: [
                 XFile.fromData(
                   file.bytes,
-                  name: file.name,
+                  name: file.path,
                   mimeType:
                       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 ),

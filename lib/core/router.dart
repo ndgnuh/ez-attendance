@@ -61,6 +61,8 @@ class AppRouter {
 
   Future<void> toCourseClassImportPage() => simpleTo(CourseClassImportPage());
 
+  Future<void> toExportPage() => simpleTo(ExportSemesterAttendanceScreen());
+
   Future toCourseClassStudentList(int courseClassId) => simpleTo(
     CourseClassStudentList(
       courseClassId: courseClassId,

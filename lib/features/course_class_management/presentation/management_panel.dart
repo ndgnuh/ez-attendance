@@ -24,6 +24,12 @@ class CourseClassManagementPanel extends StatelessWidget {
         subtitle: Text('Nhập file xlsx'),
         onTap: () => router.toCourseClassImportPage(),
       ),
+
+      ListTile(
+        title: Text("Xuất điểm danh"),
+        subtitle: Text("Xuất điểm danh của một kỳ"),
+        onTap: () => router.toExportPage(),
+      ),
     ];
 
     return CardSection(title: "Danh mục lớp", children: buttons);
