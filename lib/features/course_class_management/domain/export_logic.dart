@@ -194,15 +194,15 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
 }) {
   /// Create the file
   final xlsx = Excel.createExcel();
-  final attendanceSheet = xlsx["Điểm danh"];
-  final contributionSheet = xlsx["Tích cực"];
+  final attendanceSheet = xlsx['Điểm danh'];
+  final contributionSheet = xlsx['Tích cực'];
   final sheets = {attendanceSheet, contributionSheet};
 
   // Base cell style
   final baseStyle = CellStyle(
     verticalAlign: VerticalAlign.Center,
     horizontalAlign: HorizontalAlign.Center,
-    fontFamily: "Serif",
+    fontFamily: "serif",
     fontSize: 11,
   );
 
@@ -290,11 +290,17 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
 
     /// Auto column width
     _sheetAutoWidth(sheet, padding: 1);
-    sheet.setDefaultRowHeight(18);
+
+    /// This BREAKS microsoft 365 web excel view.
+    /// What a stupid bug. Instead, we have to set height for every row.
+    /// sheet.setDefaultRowHeight(18.0);
+    for (int row = 0; row < sheet.maxRows; row++) {
+      sheet.setRowHeight(row, 18.0);
+    }
   }
 
   final sessionById = data.sessionById;
-  buildSheet(attendanceSheet, (attendance) {
+  buildSheet(xlsx["Điểm danh"], (attendance) {
     // Ignored
     final ignoreAttendance =
         sessionById[attendance.sessionId]?.ignoreAttendance ?? false;
@@ -316,7 +322,7 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
     return IntCellValue(attendance.numContributions);
   });
 
-  /// remove unused sheets
+  // remove unused sheets
   for (final entry in xlsx.sheets.entries) {
     if (!sheets.contains(entry.value)) {
       xlsx.delete(entry.key);
@@ -324,7 +330,8 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
   }
 
   /// Save xslx file
-  return xlsx.save() as Uint8List;
+
+  return xlsx.encode() as Uint8List;
 }
 
 /// This function is yanked from the source of excel package
