@@ -26,9 +26,17 @@ class CourseClassManagementPanel extends StatelessWidget {
       ),
 
       ListTile(
+        leading: Icon(Symbols.download),
         title: Text("Xuất điểm danh"),
         subtitle: Text("Xuất điểm danh của một kỳ"),
         onTap: () => router.toExportPage(),
+      ),
+
+      ListTile(
+        leading: Icon(Symbols.search),
+        title: Text("Tìm sinh viên"),
+        subtitle: Text("Tìm kiếm sinh viên qua trong lớp"),
+        onTap: () => router.toStudentSearchPage(),
       ),
     ];
 

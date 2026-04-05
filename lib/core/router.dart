@@ -1,12 +1,13 @@
-import 'package:checkin_tool/features/settings/presentation/settings_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-import '../features/composite_screens/composite_screens.dart';
 import '../features/attendance/attendance.dart';
 import '../features/class_registration/course_class_students/page.dart';
+import '../features/composite_screens/composite_screens.dart';
 import '../features/course_class_management/course_class_management.dart';
+import '../features/gui/gui.dart';
+import '../features/settings/presentation/settings_page.dart';
 import '../features/settings/settings.dart';
 import '../features/student_management/student_management.dart';
 import 'database/database.dart';
@@ -61,19 +62,21 @@ class AppRouter {
 
   Future<void> toCourseClassImportPage() => simpleTo(CourseClassImportPage());
 
-  Future<void> toExportPage() => simpleTo(ExportSemesterAttendanceScreen());
-
   Future toCourseClassStudentList(int courseClassId) => simpleTo(
     CourseClassStudentList(
       courseClassId: courseClassId,
     ),
   );
 
+  Future<void> toExportPage() => simpleTo(ExportSemesterAttendanceScreen());
+
   Future toInitialSetupPage() => simpleTo(InitialSetupPage(), replace: true);
 
   Future toRealHomePage() => simpleTo(HomePage(), replace: true);
 
   Future toSettingsPage() => simpleTo(SettingsPage());
+
+  Future toStudentSearchPage() => simpleTo(StudentSearchScreen());
 }
 
 extension EzRouter on BuildContext {
