@@ -1,7 +1,5 @@
 import 'package:checkin_tool/theme.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-// import 'package:flutter_localizations/flutter_localizations.dart'
-//     hide GlobalMaterialLocalizations;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';

@@ -23,9 +23,11 @@ class SemesterPicker extends ConsumerWidget {
     }
 
     final semesters = semestersAsync.value!;
+    final selected = ref.watch(SemesterNotifier.provider);
     return DropdownMenu(
       expandedInsets: EdgeInsets.zero,
       label: Text("Học kỳ"),
+      initialSelection: selected,
       dropdownMenuEntries: [
         DropdownMenuEntry(label: "Tất cả", value: null),
         for (final semester in semesters)
