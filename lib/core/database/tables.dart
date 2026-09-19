@@ -29,6 +29,7 @@ class Period extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Store the active score and attendance status of students
 class Attendance extends Table {
   TextColumn get attendanceStatus => text().map(const AttendanceConverter())();
   IntColumn get numContributions => integer().withDefault(const Constant(0))();

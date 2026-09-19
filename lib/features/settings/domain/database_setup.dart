@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 import 'package:file_picker/file_picker.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart' as pp;
 
 import '../../../core/database_service.dart';
@@ -52,7 +51,7 @@ class DatabaseSetupLogic {
     if (Platform.isAndroid) {
       rootDirectory = Directory(await getSdcardPathAndroid());
     } else {
-      final rootDirectoryPath = await FilePicker.platform.getDirectoryPath(
+      final rootDirectoryPath = await FilePicker.getDirectoryPath(
         dialogTitle: "Chọn thư mục lưu CSDL",
       );
       if (rootDirectoryPath == null) return;
@@ -75,7 +74,7 @@ class DatabaseSetupLogic {
 
   Future<void> createNewDatabase() async {
     /// Get output file
-    final directory = await FilePicker.platform.getDirectoryPath(
+    final directory = await FilePicker.getDirectoryPath(
       dialogTitle: "Chọn thư mục lưu",
     );
     if (directory == null) return;

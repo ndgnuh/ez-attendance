@@ -11,6 +11,24 @@ final courseClassProvider = AsyncNotifierProvider.family(
   CourseClassNotifier.new,
 );
 
+typedef StudentInClassArgs =
+    ({
+      int studentId,
+      int classId,
+    });
+
+final detailedAttendanceProvider = StreamProvider((
+  ref,
+  StudentInClassArgs args,
+) async* {
+  final studentId = args.studentId;
+  final classId = args.classId;
+
+  final db = await ref.watch(databaseProvider.future);
+  final stmt = db.select(db.attendance);
+  stmt.where(db.attendance.studentId.equals(studentId));
+});
+
 final courseProvider = AsyncNotifierProvider.family(
   CourseNotifier.new,
 );

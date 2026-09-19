@@ -138,4 +138,12 @@ extension CourseClassesDao on AppDatabase {
       return (studentData, attendanceData.attendanceStatus);
     });
   }
+
+  /// Get attendance records base on mutiple filters
+  // Selectable<List<AttendanceData>> getAttendanceRecordByStudentInClass({
+  //   required String studentId,
+  //   required String courseClass,
+  // }) {
+  //   final stmt = select(attendance);
+  // }
 }

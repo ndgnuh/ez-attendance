@@ -4,7 +4,7 @@ library;
 
 import 'package:checkin_tool/features/course_class_management/domain/export_logic.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -89,7 +89,7 @@ class _SaveButton extends ConsumerWidget {
       case MutationSuccess(value: final file):
         return OutlinedButton(
           onPressed: () {
-            FilePicker.platform.saveFile(
+            FilePicker.saveFile(
               fileName: file.path,
               bytes: file.bytes,
             );

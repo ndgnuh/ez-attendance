@@ -2733,7 +2733,7 @@ final class $$CourseTableReferences
   static MultiTypedResultKey<$CourseClassTable, List<CourseClassData>>
   _courseClassRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.courseClass,
-    aliasName: $_aliasNameGenerator(db.course.id, db.courseClass.courseId),
+    aliasName: 'course__id__course_class__course_id',
   );
 
   $$CourseClassTableProcessedTableManager get courseClassRefs {
@@ -2911,7 +2911,7 @@ class $$CourseTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable(table),
+                          e.readTable<$CourseTable, CourseData>(table),
                           $$CourseTableReferences(db, table, e),
                         ),
                       )
@@ -3140,8 +3140,12 @@ class $$PeriodTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable(table),
-                          BaseReferences(db, table, e),
+                          e.readTable<$PeriodTable, PeriodData>(table),
+                          BaseReferences<
+                            _$AppDatabase,
+                            $PeriodTable,
+                            PeriodData
+                          >(db, table, e),
                         ),
                       )
                       .toList(),
@@ -3176,7 +3180,7 @@ final class $$SemesterTableReferences
   static MultiTypedResultKey<$CourseClassTable, List<CourseClassData>>
   _courseClassRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.courseClass,
-    aliasName: $_aliasNameGenerator(db.semester.id, db.courseClass.semesterId),
+    aliasName: 'semester__id__course_class__semester_id',
   );
 
   $$CourseClassTableProcessedTableManager get courseClassRefs {
@@ -3337,7 +3341,7 @@ class $$SemesterTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable(table),
+                          e.readTable<$SemesterTable, SemesterData>(table),
                           $$SemesterTableReferences(db, table, e),
                         ),
                       )
@@ -3421,9 +3425,7 @@ final class $$CourseClassTableReferences
   $$CourseClassTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $PeriodTable _fromPeriodTable(_$AppDatabase db) =>
-      db.period.createAlias(
-        $_aliasNameGenerator(db.courseClass.fromPeriod, db.period.id),
-      );
+      db.period.createAlias('course_class__from_period__period__id');
 
   $$PeriodTableProcessedTableManager? get fromPeriod {
     final $_column = $_itemColumn<int>('from_period');
@@ -3439,9 +3441,8 @@ final class $$CourseClassTableReferences
     );
   }
 
-  static $PeriodTable _toPeriodTable(_$AppDatabase db) => db.period.createAlias(
-    $_aliasNameGenerator(db.courseClass.toPeriod, db.period.id),
-  );
+  static $PeriodTable _toPeriodTable(_$AppDatabase db) =>
+      db.period.createAlias('course_class__to_period__period__id');
 
   $$PeriodTableProcessedTableManager? get toPeriod {
     final $_column = $_itemColumn<int>('to_period');
@@ -3457,9 +3458,8 @@ final class $$CourseClassTableReferences
     );
   }
 
-  static $CourseTable _courseIdTable(_$AppDatabase db) => db.course.createAlias(
-    $_aliasNameGenerator(db.courseClass.courseId, db.course.id),
-  );
+  static $CourseTable _courseIdTable(_$AppDatabase db) =>
+      db.course.createAlias('course_class__course_id__course__id');
 
   $$CourseTableProcessedTableManager get courseId {
     final $_column = $_itemColumn<String>('course_id')!;
@@ -3476,9 +3476,7 @@ final class $$CourseClassTableReferences
   }
 
   static $SemesterTable _semesterIdTable(_$AppDatabase db) =>
-      db.semester.createAlias(
-        $_aliasNameGenerator(db.courseClass.semesterId, db.semester.id),
-      );
+      db.semester.createAlias('course_class__semester_id__semester__id');
 
   $$SemesterTableProcessedTableManager get semesterId {
     final $_column = $_itemColumn<int>('semester_id')!;
@@ -3497,10 +3495,7 @@ final class $$CourseClassTableReferences
   static MultiTypedResultKey<$SessionTable, List<SessionData>>
   _sessionRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.session,
-    aliasName: $_aliasNameGenerator(
-      db.courseClass.id,
-      db.session.courseClassId,
-    ),
+    aliasName: 'course_class__id__session__course_class_id',
   );
 
   $$SessionTableProcessedTableManager get sessionRefs {
@@ -3518,10 +3513,7 @@ final class $$CourseClassTableReferences
   static MultiTypedResultKey<$RegistrationTable, List<RegistrationData>>
   _registrationRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.registration,
-    aliasName: $_aliasNameGenerator(
-      db.courseClass.id,
-      db.registration.courseClassId,
-    ),
+    aliasName: 'course_class__id__registration__course_class_id',
   );
 
   $$RegistrationTableProcessedTableManager get registrationRefs {
@@ -4075,7 +4067,9 @@ class $$CourseClassTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable(table),
+                          e.readTable<$CourseClassTable, CourseClassData>(
+                            table,
+                          ),
                           $$CourseClassTableReferences(db, table, e),
                         ),
                       )
@@ -4265,9 +4259,7 @@ final class $$SessionTableReferences
   $$SessionTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $CourseClassTable _courseClassIdTable(_$AppDatabase db) =>
-      db.courseClass.createAlias(
-        $_aliasNameGenerator(db.session.courseClassId, db.courseClass.id),
-      );
+      db.courseClass.createAlias('session__course_class_id__course_class__id');
 
   $$CourseClassTableProcessedTableManager get courseClassId {
     final $_column = $_itemColumn<int>('course_class_id')!;
@@ -4286,7 +4278,7 @@ final class $$SessionTableReferences
   static MultiTypedResultKey<$AttendanceTable, List<AttendanceData>>
   _attendanceRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.attendance,
-    aliasName: $_aliasNameGenerator(db.session.id, db.attendance.sessionId),
+    aliasName: 'session__id__attendance__session_id',
   );
 
   $$AttendanceTableProcessedTableManager get attendanceRefs {
@@ -4564,7 +4556,7 @@ class $$SessionTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable(table),
+                          e.readTable<$SessionTable, SessionData>(table),
                           $$SessionTableReferences(db, table, e),
                         ),
                       )
@@ -4676,7 +4668,7 @@ final class $$StudentTableReferences
   static MultiTypedResultKey<$AttendanceTable, List<AttendanceData>>
   _attendanceRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.attendance,
-    aliasName: $_aliasNameGenerator(db.student.id, db.attendance.studentId),
+    aliasName: 'student__id__attendance__student_id',
   );
 
   $$AttendanceTableProcessedTableManager get attendanceRefs {
@@ -4694,7 +4686,7 @@ final class $$StudentTableReferences
   static MultiTypedResultKey<$RegistrationTable, List<RegistrationData>>
   _registrationRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.registration,
-    aliasName: $_aliasNameGenerator(db.student.id, db.registration.studentId),
+    aliasName: 'student__id__registration__student_id',
   );
 
   $$RegistrationTableProcessedTableManager get registrationRefs {
@@ -4960,7 +4952,7 @@ class $$StudentTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable(table),
+                          e.readTable<$StudentTable, StudentData>(table),
                           $$StudentTableReferences(db, table, e),
                         ),
                       )
@@ -5066,9 +5058,7 @@ final class $$AttendanceTableReferences
   $$AttendanceTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $SessionTable _sessionIdTable(_$AppDatabase db) =>
-      db.session.createAlias(
-        $_aliasNameGenerator(db.attendance.sessionId, db.session.id),
-      );
+      db.session.createAlias('attendance__session_id__session__id');
 
   $$SessionTableProcessedTableManager get sessionId {
     final $_column = $_itemColumn<int>('session_id')!;
@@ -5085,9 +5075,7 @@ final class $$AttendanceTableReferences
   }
 
   static $StudentTable _studentIdTable(_$AppDatabase db) =>
-      db.student.createAlias(
-        $_aliasNameGenerator(db.attendance.studentId, db.student.id),
-      );
+      db.student.createAlias('attendance__student_id__student__id');
 
   $$StudentTableProcessedTableManager get studentId {
     final $_column = $_itemColumn<String>('student_id')!;
@@ -5363,7 +5351,7 @@ class $$AttendanceTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable(table),
+                          e.readTable<$AttendanceTable, AttendanceData>(table),
                           $$AttendanceTableReferences(db, table, e),
                         ),
                       )
@@ -5459,10 +5447,9 @@ final class $$RegistrationTableReferences
         BaseReferences<_$AppDatabase, $RegistrationTable, RegistrationData> {
   $$RegistrationTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static $CourseClassTable _courseClassIdTable(_$AppDatabase db) =>
-      db.courseClass.createAlias(
-        $_aliasNameGenerator(db.registration.courseClassId, db.courseClass.id),
-      );
+  static $CourseClassTable _courseClassIdTable(_$AppDatabase db) => db
+      .courseClass
+      .createAlias('registration__course_class_id__course_class__id');
 
   $$CourseClassTableProcessedTableManager get courseClassId {
     final $_column = $_itemColumn<int>('course_class_id')!;
@@ -5479,9 +5466,7 @@ final class $$RegistrationTableReferences
   }
 
   static $StudentTable _studentIdTable(_$AppDatabase db) =>
-      db.student.createAlias(
-        $_aliasNameGenerator(db.registration.studentId, db.student.id),
-      );
+      db.student.createAlias('registration__student_id__student__id');
 
   $$StudentTableProcessedTableManager get studentId {
     final $_column = $_itemColumn<String>('student_id')!;
@@ -5718,7 +5703,9 @@ class $$RegistrationTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable(table),
+                          e.readTable<$RegistrationTable, RegistrationData>(
+                            table,
+                          ),
                           $$RegistrationTableReferences(db, table, e),
                         ),
                       )

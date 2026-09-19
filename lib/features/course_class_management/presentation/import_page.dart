@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -106,13 +106,13 @@ class _ImportButton extends ConsumerWidget {
     final messenger = ScaffoldMessenger.of(context);
     final semester = ref.watch(SemesterNotifier.providerForImportPage);
     onPressed() async {
-      final result = await FilePicker.platform.pickFiles(withData: true);
-      if (result == null) {
+      final pickedFile = await FilePicker.pickFile();
+      if (pickedFile == null) {
         return;
       }
 
       final notifier = ref.read(ImportDataNotifier.instance);
-      final bytes = result.files.first.bytes!;
+      final bytes = await pickedFile.readAsBytes();
       notifier.clear();
       try {
         final importData = importHandler(bytes);

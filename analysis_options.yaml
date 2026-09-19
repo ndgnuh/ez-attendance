@@ -31,3 +31,11 @@ formatter:
 analyzer:
   errors:
     avoid_print: ignore
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**

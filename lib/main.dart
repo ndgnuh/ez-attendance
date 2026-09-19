@@ -1,9 +1,10 @@
+import 'package:checkin_tool/theme.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_gutter/flutter_gutter.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart'
+//     hide GlobalMaterialLocalizations;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:material_ui/material_ui.dart';
 
 import './core/router.dart';
 import './shared/context.dart';
@@ -41,44 +42,20 @@ class MyApp extends ConsumerWidget {
       error: (e, st) => ThemeMode.system,
     );
 
-    final subThemesData = FlexSubThemesData(
-      blendOnColors: true,
-      inputDecoratorIsFilled: true,
-      alignedDropdown: true,
-      defaultRadius: context.gutterTiny,
-      useMaterial3Typography: true,
-      searchUseGlobalShape: true,
-    );
-
     // final scheme = FlexScheme.deepBlue;
-    final scheme = FlexScheme.blue;
     FlexScheme.blue;
-
-    final iconTheme = const IconThemeData(fill: 0.0);
 
     return MaterialApp(
       title: 'Attendance Tool',
       navigatorKey: navigationKey,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [
-        Locale('en'), // English
-        Locale('vi'), // French
+        Locale('en', "US"), // English
+        Locale('vi', "VN"), // Vietnamese
       ],
-      locale: const Locale("vi"),
-      darkTheme: FlexThemeData.dark(
-        scheme: scheme,
-        subThemesData: subThemesData,
-        keyColors: const FlexKeyColors(),
-      ).copyWith(iconTheme: iconTheme),
-      theme: FlexThemeData.light(
-        scheme: scheme,
-        subThemesData: subThemesData,
-        keyColors: const FlexKeyColors(),
-      ).copyWith(iconTheme: iconTheme),
+      // locale: const Locale("vi"),
+      darkTheme: AppTheme.dark,
+      theme: AppTheme.light,
       themeMode: themeMode,
       home: AppRouter(context).homePage(),
       builder:

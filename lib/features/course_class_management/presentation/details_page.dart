@@ -1,7 +1,7 @@
 import 'package:checkin_tool/features/course_class_management/presentation/period_tile.dart';
 import 'package:checkin_tool/features/course_class_management/presentation/widgets/export_button.dart';
 import 'package:checkin_tool/features/course_class_management/presentation/widgets/location_edit_tile.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';

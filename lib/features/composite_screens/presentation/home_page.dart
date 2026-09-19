@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:checkin_tool/features/gui/screens/timer_creation.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../core/router.dart';
 import '../../../design.dart';
@@ -20,6 +22,19 @@ class HomePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text("Trang chính"),
+          actions: [
+            TextButton.icon(
+              onPressed:
+                  () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TimerCreationScreen(),
+                    ),
+                  ),
+              icon: Icon(Symbols.warning),
+              label: Text("Hẹn giờ"),
+            ),
+          ],
           bottom: TabBar(
             tabs: tabs,
             isScrollable: true,
