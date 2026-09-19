@@ -16,7 +16,7 @@ import 'package:riverpod/riverpod.dart';
 
 final databaseSetupLogicProvider = Provider(DatabaseSetupLogic.new);
 
-const platform = MethodChannel('com.ndgnuh.attendance_tool/storage');
+const platform = MethodChannel('com.ndgnuh.ez_attendance/storage');
 
 Future<String> getSdcardPathAndroid() async {
   return await platform.invokeMethod('getStorageRoot');

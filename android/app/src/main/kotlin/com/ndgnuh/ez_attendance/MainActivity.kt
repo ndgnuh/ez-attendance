@@ -1,4 +1,4 @@
-package com.example.checkin_tool
+package com.ndgnuh.ez_attendance
 
 import android.os.Environment
 import io.flutter.embedding.android.FlutterActivity
@@ -6,7 +6,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.ndgnuh.attendance_tool/storage";
+    private val CHANNEL = "com.ndgnuh.ez_attendance/storage";
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine);
