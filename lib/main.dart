@@ -48,7 +48,7 @@ class MyApp extends ConsumerWidget {
       navigatorKey: navigationKey,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [
-        Locale('en', "US"), // English
+        // Locale('en', "US"), // English
         Locale('vi', "VN"), // Vietnamese
       ],
       // locale: const Locale("vi"),

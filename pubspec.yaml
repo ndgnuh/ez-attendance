@@ -15,7 +15,7 @@ publish_to: none
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.4.3
+version: 1.4.4
 environment:
   sdk: ^3.7.2
 dependencies:
@@ -33,7 +33,10 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.1
   file_picker: ^13.1.0
-  filesystem_picker: any
+  filesystem_picker:
+    git:
+      url: https://github.com/ndgnuh/filesystem_picker
+      path: package
 
   # Scanning QR for quick check-in
   camera: ^0.12.1

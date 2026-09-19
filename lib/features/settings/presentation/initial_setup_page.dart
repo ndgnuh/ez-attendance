@@ -113,7 +113,7 @@ class _DatabasePathPicker extends ConsumerWidget {
               title: const Text('Chọn cơ sở dữ liệu hiện có'),
               onTap: () {
                 Navigator.of(context).pop();
-                logic.pickExistingDatabase();
+                logic.pickExistingDatabase(context);
               },
             ),
             ListTile(

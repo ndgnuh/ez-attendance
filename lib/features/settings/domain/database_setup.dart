@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:checkin_tool/shared/context.dart';
 import 'package:checkin_tool/shared/dialogs.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:path/path.dart' as path;
 import 'package:file_picker/file_picker.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
@@ -46,7 +47,7 @@ class DatabaseSetupLogic {
 
   const DatabaseSetupLogic(this.ref);
 
-  Future<void> pickExistingDatabase() async {
+  Future<void> pickExistingDatabase([BuildContext? context]) async {
     final Directory? rootDirectory;
     if (Platform.isAndroid) {
       rootDirectory = Directory(await getSdcardPathAndroid());
@@ -58,8 +59,8 @@ class DatabaseSetupLogic {
       rootDirectory = Directory(rootDirectoryPath);
     }
 
-    final databasePath = await FilesystemPicker.openDialog(
-      context: navigationKey.currentContext!,
+    final databasePath = await FilesystemPicker.openBottomSheet(
+      context: context ?? navigationKey.currentContext!,
       title: "Chọn CSDL",
       pickText: 'Chọn cơ sở dữ liệu',
       fsType: FilesystemType.file,
