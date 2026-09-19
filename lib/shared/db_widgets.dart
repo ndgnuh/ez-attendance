@@ -4,9 +4,7 @@ library;
 
 import 'package:checkin_tool/core/database_service.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod/riverpod.dart';
 
 Stream<StudentData?> _queryStudent({
   required final Ref ref,

@@ -1,4 +1,3 @@
-import 'package:checkin_tool/core/database/tables.dart';
 import 'package:checkin_tool/core/router.dart';
 import 'package:checkin_tool/features/attendance/domain/dao.dart';
 import 'package:checkin_tool/features/attendance/domain/data_model.dart';

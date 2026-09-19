@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:checkin_tool/core/database_service.dart';
 import 'package:checkin_tool/core/preference_service.dart';
 import 'package:drift/drift.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:riverpod/riverpod.dart';
 
-import '../../../core/enums.dart';
 import '../domain/dao.dart';
 import '../domain/data_model.dart';
 

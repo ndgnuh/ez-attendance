@@ -1,6 +1,5 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
-import 'dart:math';
 
 class ConstrainedAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget child;
