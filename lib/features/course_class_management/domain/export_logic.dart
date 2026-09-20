@@ -214,15 +214,21 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
 
   void buildSheet(
     Sheet sheet,
-    CellValue Function(AttendanceData) tableCellBuilder,
-  ) {
+    CellValue Function(AttendanceData) tableCellBuilder, {
+    bool includeIgnoreAttendance = false,
+  }) {
+    // Filter sessions base on the inclusion
+    final sessionList = switch (includeIgnoreAttendance) {
+      true => data.sessionList,
+      false => data.sessionList.where((session) => !session.ignoreAttendance),
+    };
+
     // Header row
     final dateFormat = DateFormat("dd-MM-yyyy");
     final headerTexts = [
       "MSSV",
       "Họ và tên",
-      for (final session in data.sessionList)
-        dateFormat.format(session.startTime),
+      for (final session in sessionList) dateFormat.format(session.startTime),
     ];
 
     /// Write header row
@@ -264,7 +270,12 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
       );
 
       /// Write attendance data
-      for (final session in data.sessionList) {
+      for (final (idx, session) in sessionList.indexed) {
+        // Skip sessions with ignored attendance list
+        if (!includeIgnoreAttendance && session.ignoreAttendance) {
+          continue;
+        }
+
         /// Get attendance data
         final defaultAttendance = AttendanceData(
           sessionId: session.id,
@@ -275,7 +286,7 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
         final attendance = attendanceMap[session] ?? defaultAttendance;
 
         /// Get cell index
-        final columnIndex = columnOffset + inverseSessionMap[session]!;
+        final columnIndex = columnOffset + idx;
         final cellIndex = CellIndex.indexByColumnRow(
           columnIndex: columnIndex,
           rowIndex: rowIndex,
@@ -299,6 +310,7 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
     }
   }
 
+  // Build attendance sheet
   final sessionById = data.sessionById;
   buildSheet(xlsx["Điểm danh"], (attendance) {
     // Ignored
@@ -318,9 +330,10 @@ FutureOr<Uint8List> _buildCourseClassAttendanceXlsx({
     return TextCellValue(attendanceText);
   });
 
+  // Build contribution sheet
   buildSheet(contributionSheet, (attendance) {
     return IntCellValue(attendance.numContributions);
-  });
+  }, includeIgnoreAttendance: true);
 
   // remove unused sheets
   for (final entry in xlsx.sheets.entries) {
