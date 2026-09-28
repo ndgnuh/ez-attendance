@@ -321,8 +321,19 @@ class _BatchContributionValueInputState
   final controller = TextEditingController();
 
   @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final value = BatchUpdateModel.updateValueOf(context);
+    final valueString = value.toString();
+
+    if (valueString != controller.text) {
+      controller.text = value.toString();
+    }
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(label: Text("Giá trị thay đổi")),
@@ -340,7 +351,11 @@ class _BatchContributionValueInputState
             final actions = BatchUpdateModel.actionsOf(context);
             actions.setUpdateValue(value);
           case null:
-            controller.text = value.toString();
+            // Only try to correct non-empty text
+            // otherwise it will be very annoying
+            if (controller.text.isNotEmpty) {
+              controller.text = value.toString();
+            }
         }
       },
     );
