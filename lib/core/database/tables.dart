@@ -119,6 +119,9 @@ class Semester extends Table {
   TextColumn get name => text()();
 }
 
+/// Represent one study [Session].
+/// Sessions are loosely coupled with the period
+/// Since periods data can change, but the sessions are history.
 class Session extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get courseClassId =>
