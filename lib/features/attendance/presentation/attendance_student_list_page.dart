@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../shared/dialogs.dart';
+import '../../batch_contribution/batch_contribution.dart';
 import '../domain/dao.dart';
 import 'providers.dart';
 import 'widgets/add_student_button.dart';
@@ -25,8 +26,7 @@ class AttendanceStudentListPage extends ConsumerWidget {
       appBar: AppBar(
         title: Text("Điểm danh"),
         actions: [
-          SessionDeleteButton(sessionId: sessionId),
-          AddStudentButton(sessionId: sessionId),
+          _ActionMenu(sessionId: sessionId),
         ],
       ),
       body: Padding(
@@ -64,6 +64,81 @@ class AttendanceStudentListPage extends ConsumerWidget {
   }
 }
 
+class _ActionMenu extends StatefulWidget {
+  const _ActionMenu({
+    required this.sessionId,
+  });
+
+  final int sessionId;
+
+  @override
+  State<_ActionMenu> createState() => _ActionMenuState();
+}
+
+class _ActionMenuState extends State<_ActionMenu> {
+  final MenuController controller = MenuController();
+
+  @override
+  Widget build(BuildContext context) {
+    return MenuAnchor(
+      builder: (context, controller, child) => child!,
+      controller: controller,
+      menuChildren: [
+        ListTile(
+          title: Text("Cộng điểm hàng loạt"),
+          subtitle: Text("Cộng điểm cho nhiều sinh viên cùng một lúc"),
+          leading: Icon(Symbols.batch_prediction),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => BatchContributionPage(sessionId: widget.sessionId),
+              ),
+            );
+            controller.close();
+          },
+        ),
+        Divider(),
+        AddStudentButton(
+          sessionId: widget.sessionId,
+          builder: (BuildContext context, onPressed) {
+            return ListTile(
+              leading: Icon(Symbols.add),
+              title: Text("Thêm sinh viên"),
+              onTap: () {
+                controller.close();
+                onPressed();
+              },
+            );
+          },
+        ),
+        SessionDeleteButton(
+          sessionId: widget.sessionId,
+          builder: (context, onPressed) {
+            final scheme = ColorScheme.of(context);
+            return ListTile(
+              leading: Icon(Symbols.delete, color: scheme.error),
+              title: Text(
+                "Xóa buổi học",
+                style: TextStyle(color: scheme.error),
+              ),
+              onTap: () {
+                controller.close();
+                onPressed();
+              },
+            );
+          },
+        ),
+      ],
+      child: IconButton(
+        onPressed: () => controller.open(),
+        icon: Icon(Symbols.menu_rounded),
+      ),
+    );
+  }
+}
+
 class AttendanceSearchBar extends ConsumerWidget {
   const AttendanceSearchBar({super.key});
 
@@ -96,16 +171,21 @@ class AttendanceSearchBar extends ConsumerWidget {
 
 class SessionDeleteButton extends StatelessWidget {
   final int sessionId;
+  final Widget Function(BuildContext context, VoidCallback onPressed) builder;
 
-  const SessionDeleteButton({super.key, required this.sessionId});
+  const SessionDeleteButton({
+    super.key,
+    required this.sessionId,
+    required this.builder,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final scheme = ColorScheme.of(context);
     final ref = ProviderScope.containerOf(context);
     final navigator = Navigator.of(context);
-    return TextButton.icon(
-      onPressed: () async {
+    return builder(
+      context,
+      () async {
         final ok = await showConfirmationDialog(
           context: context,
           titleText: "Xóa buổi điểm danh?",
@@ -117,8 +197,6 @@ class SessionDeleteButton extends StatelessWidget {
         await db.deleteAttendanceSession(sessionId);
         navigator.pop();
       },
-      label: Text("Xóa buổi học", style: TextStyle(color: scheme.error)),
-      icon: Icon(Symbols.delete, color: scheme.error),
     );
   }
 }

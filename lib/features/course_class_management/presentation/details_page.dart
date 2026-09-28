@@ -136,6 +136,10 @@ class _GeneralInfoTab extends ConsumerWidget {
 
     final generalInfo = [
       ListTile(
+        title: Text("Mã lớp"),
+        subtitle: Text(courseClass!.classCode),
+      ),
+      ListTile(
         title: Text("Học phần"),
         subtitle: Text('${course?.id} - ${course?.name}'),
       ),

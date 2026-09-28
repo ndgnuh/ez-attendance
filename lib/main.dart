@@ -1,12 +1,12 @@
-import 'package:checkin_tool/theme.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
+import './core/preference_service.dart';
 import './core/router.dart';
 import './shared/context.dart';
-import './core/preference_service.dart';
+import './theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +46,7 @@ class MyApp extends ConsumerWidget {
     return MaterialApp(
       title: 'Attendance Tool',
       navigatorKey: navigationKey,
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [
         // Locale('en', "US"), // English
