@@ -21,6 +21,7 @@ Future<void> addSession({
   required final TimeOfDay startTime,
   required final TimeOfDay endTime,
 }) async {
+  // convert to database time
   final startTime_ = day.copyWith(
     hour: startTime.hour,
     minute: startTime.minute,
@@ -30,12 +31,36 @@ Future<void> addSession({
     minute: endTime.minute,
   );
 
-  final comp = SessionCompanion.insert(
+  /// Get the students from the class
+  final studentsSelect = db.select(db.registration);
+  studentsSelect.where((r) => r.courseClassId.equals(classId));
+  final registrations = await studentsSelect.get();
+
+  // Session companion
+  final sessionItem = SessionCompanion.insert(
     courseClassId: classId,
     startTime: startTime_,
     endTime: endTime_,
   );
-  await db.into(db.session).insert(comp);
+
+  return await db.transaction(() async {
+    // Create attendance session first
+    final sessionId = await db.into(db.session).insert(sessionItem);
+
+    final attendanceItems = registrations.map((registration) {
+      final studentId = registration.studentId;
+      return AttendanceCompanion.insert(
+        attendanceStatus: AttendanceStatus.absent,
+        sessionId: sessionId,
+        studentId: studentId,
+      );
+    });
+
+    // Batch insert
+    for (final attendanceItem in attendanceItems) {
+      await db.into(db.attendance).insert(attendanceItem);
+    }
+  });
 }
 
 /// Get default session time from the db and current time

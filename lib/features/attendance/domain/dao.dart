@@ -21,38 +21,6 @@ extension Dao on AppDatabase {
   /// Create attendance session for a course class  [id]
   /// Insert all  the student from thencourse class to the attendance record
   /// The default attendance status is [absent]
-  Future<Null> createAttendanceSession({
-    required int courseClassId,
-    required DateTime startTime,
-    required DateTime endTime,
-  }) async {
-    final sessionItem = SessionCompanion.insert(
-      courseClassId: courseClassId,
-      startTime: startTime,
-      endTime: endTime,
-    );
-
-    final studentsSelect = getClassStudentList(id: courseClassId);
-    return await transaction(() async {
-      // Create attendance session first
-      final sessionId = await into(session).insert(sessionItem);
-
-      // Map to attendance companion
-      final attendanceItems =
-          await studentsSelect.map((student) {
-            return AttendanceCompanion.insert(
-              attendanceStatus: AttendanceStatus.absent,
-              sessionId: sessionId,
-              studentId: student.id,
-            );
-          }).get();
-
-      // Batch insert
-      for (final attendanceItem in attendanceItems) {
-        await into(attendance).insertOnConflictUpdate(attendanceItem);
-      }
-    });
-  }
 
   /// List students in an attendance session
   /// The student are sorted by first name and then by ID
