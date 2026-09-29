@@ -1,3 +1,6 @@
+import 'package:checkin_tool/core/database_service.dart';
+import 'package:checkin_tool/features/add_session/database.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 enum AddSessionAspect {
@@ -8,7 +11,7 @@ enum AddSessionAspect {
   ignoreAttendance,
 }
 
-class AddSessionScope extends StatefulWidget {
+class AddSessionScope extends ConsumerStatefulWidget {
   final Widget child;
   final int classId;
   const AddSessionScope({
@@ -18,14 +21,32 @@ class AddSessionScope extends StatefulWidget {
   });
 
   @override
-  State<AddSessionScope> createState() => _AddSessionScopeState();
+  ConsumerState<AddSessionScope> createState() => _AddSessionScopeState();
 }
 
-class _AddSessionScopeState extends State<AddSessionScope> {
+class _AddSessionScopeState extends ConsumerState<AddSessionScope> {
   DateTime day = DateTime.now();
-  TimeOfDay? startTime;
-  TimeOfDay? endTime;
+  TimeOfDay startTime = TimeOfDay(hour: 0, minute: 0);
+  TimeOfDay endTime = TimeOfDay(hour: 0, minute: 0);
   bool ignoreAttendance = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDefaults();
+  }
+
+  Future<void> fetchDefaults() async {
+    final db = await ref.read(databaseProvider.future);
+    final classId = widget.classId;
+    final userDefaults = await getDefaultSessionTime(db: db, classId: classId);
+    print(userDefaults);
+    setState(() {
+      day = userDefaults.day;
+      startTime = userDefaults.startTime;
+      endTime = userDefaults.endTime;
+    });
+  }
 
   void updateFunction({
     DateTime? day,
@@ -34,14 +55,14 @@ class _AddSessionScopeState extends State<AddSessionScope> {
     bool? ignoreAttendance,
   }) => setState(() {
     this.day = day ?? this.day;
-    this.startTime = startTime;
-    this.endTime = endTime;
+    this.startTime = startTime ?? this.startTime;
+    this.endTime = endTime ?? this.endTime;
     this.ignoreAttendance = ignoreAttendance ?? this.ignoreAttendance;
   });
 
   @override
   Widget build(BuildContext context) {
-    return AddSessionModel(
+    final model = AddSessionModel(
       classId: widget.classId,
       startTime: startTime,
       endTime: endTime,
@@ -50,6 +71,8 @@ class _AddSessionScopeState extends State<AddSessionScope> {
       day: day,
       child: widget.child,
     );
+    print(model.day);
+    return model;
   }
 }
 
@@ -64,8 +87,8 @@ typedef UpdateFunction =
 class AddSessionModel extends InheritedModel<AddSessionAspect> {
   final int classId;
   final DateTime day;
-  final TimeOfDay? startTime;
-  final TimeOfDay? endTime;
+  final TimeOfDay startTime;
+  final TimeOfDay endTime;
   final bool ignoreAttendance;
   final UpdateFunction updateFunction;
 
@@ -86,28 +109,34 @@ class AddSessionModel extends InheritedModel<AddSessionAspect> {
   }
 
   static DateTime dayOf(BuildContext context) {
-    final model = context.dependOnInheritedWidgetOfExactType<AddSessionModel>(
-      aspect: AddSessionAspect.startTime,
+    final model = InheritedModel.inheritFrom<AddSessionModel>(
+      context,
+      aspect: AddSessionAspect.day,
     );
     return model!.day;
   }
 
-  static TimeOfDay? startTimeOf(BuildContext context) {
-    final model = context.dependOnInheritedWidgetOfExactType<AddSessionModel>(
+  static TimeOfDay startTimeOf(BuildContext context) {
+    final model = InheritedModel.inheritFrom<AddSessionModel>(
+      context,
       aspect: AddSessionAspect.startTime,
     );
     return model!.startTime;
   }
 
-  static TimeOfDay? endTimeOf(BuildContext context) {
-    final model = context.dependOnInheritedWidgetOfExactType<AddSessionModel>(
+  static TimeOfDay endTimeOf(BuildContext context) {
+    final model = InheritedModel.inheritFrom<AddSessionModel>(
+      context,
       aspect: AddSessionAspect.endTime,
     );
     return model!.endTime;
   }
 
   static bool ignoreAttendanceOf(BuildContext context) {
-    final model = context.dependOnInheritedWidgetOfExactType<AddSessionModel>();
+    final model = InheritedModel.inheritFrom<AddSessionModel>(
+      context,
+      aspect: AddSessionAspect.ignoreAttendance,
+    );
     return model!.ignoreAttendance;
   }
 
@@ -135,12 +164,12 @@ class AddSessionModel extends InheritedModel<AddSessionAspect> {
           if (day != oldWidget.day) return true;
         case AddSessionAspect.startTime:
           if (startTime != oldWidget.startTime) return true;
-        case AddSessionAspect.courseClass:
-          return false;
         case AddSessionAspect.endTime:
           if (endTime != oldWidget.endTime) return true;
         case AddSessionAspect.ignoreAttendance:
           if (ignoreAttendance != oldWidget.ignoreAttendance) return true;
+        case AddSessionAspect.courseClass:
+          if (classId != oldWidget.classId) return true;
       }
     }
 

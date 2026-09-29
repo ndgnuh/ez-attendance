@@ -5,6 +5,11 @@ library;
 
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
+
+/// Somehow I came up with a type that nearly matches the universal standards
+/// The different is that ISO8601 considers monday = 1, this one is 0.
+/// https://api.dart.dev/dart-core/DateTime/weekday.html
 enum DayOfWeek implements Comparable<DayOfWeek> {
   monday,
   tuesday,
@@ -17,6 +22,14 @@ enum DayOfWeek implements Comparable<DayOfWeek> {
   /// Natural order based on the enum declaration (0 to 6)
   @override
   int compareTo(DayOfWeek other) => index.compareTo(other.index);
+
+  factory DayOfWeek.fromIso8601(int weekDay) {
+    if (weekDay > 0 && weekDay <= 8) {
+      return DayOfWeek.values[weekDay - 1];
+    } else {
+      throw "Invalid ISO8601 day of week";
+    }
+  }
 
   /// Returns the enum value from an integer index (0-6).
   /// Falls back to monday if the index is out of bounds.
