@@ -1,5 +1,6 @@
 import 'package:checkin_tool/core/database_service.dart';
 import 'package:checkin_tool/features/add_session/database.dart';
+import 'package:checkin_tool/features/add_session/widgets/time_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -10,6 +11,12 @@ enum AddSessionAspect {
   endTime,
   ignoreAttendance,
 }
+
+final periodsProvider = StreamProvider((ref) async* {
+  final db = await ref.watch(databaseProvider.future);
+  final stmt = db.select(db.period);
+  yield* stmt.watch();
+});
 
 class AddSessionScope extends ConsumerStatefulWidget {
   final Widget child;
@@ -33,14 +40,27 @@ class _AddSessionScopeState extends ConsumerState<AddSessionScope> {
   @override
   void initState() {
     super.initState();
-    fetchDefaults();
+    fetchData();
   }
 
-  Future<void> fetchDefaults() async {
+  Future<void> submit() async {
+    assert(startTime.isBefore(endTime), "Thời gian bắt đầu phải ở trước");
+    final db = await ref.read(databaseProvider.future);
+    final classId = widget.classId;
+    await addSession(
+      db: db,
+      classId: classId,
+      day: day,
+      startTime: startTime,
+      endTime: endTime,
+    );
+  }
+
+  Future<void> fetchData() async {
     final db = await ref.read(databaseProvider.future);
     final classId = widget.classId;
     final userDefaults = await getDefaultSessionTime(db: db, classId: classId);
-    print(userDefaults);
+
     setState(() {
       day = userDefaults.day;
       startTime = userDefaults.startTime;
@@ -63,6 +83,7 @@ class _AddSessionScopeState extends ConsumerState<AddSessionScope> {
   @override
   Widget build(BuildContext context) {
     final model = AddSessionModel(
+      submitFunction: submit,
       classId: widget.classId,
       startTime: startTime,
       endTime: endTime,
@@ -91,6 +112,7 @@ class AddSessionModel extends InheritedModel<AddSessionAspect> {
   final TimeOfDay endTime;
   final bool ignoreAttendance;
   final UpdateFunction updateFunction;
+  final Future<void> Function() submitFunction;
 
   const AddSessionModel({
     super.key,
@@ -101,11 +123,17 @@ class AddSessionModel extends InheritedModel<AddSessionAspect> {
     required this.ignoreAttendance,
     required this.updateFunction,
     required this.day,
+    required this.submitFunction,
   });
 
   static UpdateFunction getUpdater(BuildContext context) {
     final model = context.getInheritedWidgetOfExactType<AddSessionModel>();
     return model!.updateFunction;
+  }
+
+  static Future<void> Function() getSubmitFunction(BuildContext context) {
+    final model = context.getInheritedWidgetOfExactType<AddSessionModel>();
+    return model!.submitFunction;
   }
 
   static DateTime dayOf(BuildContext context) {

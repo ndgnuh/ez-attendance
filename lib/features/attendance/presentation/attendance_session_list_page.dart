@@ -2,9 +2,8 @@
 /// Export [AttendanceSessionListPage] widget (a page).
 library;
 
+import 'package:checkin_tool/core/db_consumers.dart';
 import 'package:checkin_tool/features/add_session/page.dart';
-import 'package:checkin_tool/features/batch_contribution/widgets.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -24,24 +23,44 @@ class AttendanceSessionListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Buổi điểm danh"),
+        title: Text("Buổi học"),
         actions: [
           _PageMenu(classId: courseClassId),
         ],
       ),
-      floatingActionButton: AttendanceSessionCreateButton(
-        courseClassId: courseClassId,
-        builder: (context, onPressed) {
-          return FloatingActionButton.extended(
-            onPressed: onPressed,
-            icon: Icon(Symbols.add),
-            label: Text("Thêm buổi"),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddSessionPage(classId: courseClassId),
+            ),
           );
         },
+        icon: Icon(Symbols.add),
+        label: Text("Thêm"),
       ),
       body: Padding(
         padding: EdgeInsets.all(context.gutter),
-        child: AttendanceSessionListView(courseClassId: courseClassId),
+        child: Column(
+          children: [
+            CourseClassConsumer(
+              id: courseClassId,
+              builder: (context, courseClass) {
+                return ListTile(
+                  leading: Icon(Symbols.numbers),
+                  title: Text("Mã lớp"),
+                  subtitle: Text(
+                    "${courseClass.classCode} - ${courseClass.courseId}",
+                  ),
+                );
+              },
+            ),
+            Expanded(
+              child: AttendanceSessionListView(courseClassId: courseClassId),
+            ),
+          ],
+        ),
       ),
     );
   }

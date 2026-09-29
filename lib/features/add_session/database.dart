@@ -13,6 +13,31 @@ typedef UserDefaults =
       TimeOfDay endTime,
     });
 
+/// Add session from inputs
+Future<void> addSession({
+  required final AppDatabase db,
+  required final int classId,
+  required final DateTime day,
+  required final TimeOfDay startTime,
+  required final TimeOfDay endTime,
+}) async {
+  final startTime_ = day.copyWith(
+    hour: startTime.hour,
+    minute: startTime.minute,
+  );
+  final endTime_ = day.copyWith(
+    hour: endTime.hour,
+    minute: endTime.minute,
+  );
+
+  final comp = SessionCompanion.insert(
+    courseClassId: classId,
+    startTime: startTime_,
+    endTime: endTime_,
+  );
+  await db.into(db.session).insert(comp);
+}
+
 /// Get default session time from the db and current time
 Future<UserDefaults> getDefaultSessionTime({
   required final AppDatabase db,
@@ -33,7 +58,7 @@ Future<UserDefaults> getDefaultSessionTime({
     ),
     rightOuterJoin(
       dbEndPeriod,
-      dbEndPeriod.id.equalsExp(db.courseClass.fromPeriod),
+      dbEndPeriod.id.equalsExp(db.courseClass.toPeriod),
     ),
   ]);
 

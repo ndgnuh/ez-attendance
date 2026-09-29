@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../ui_model.dart';
@@ -11,10 +12,9 @@ class DayPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final updater = AddSessionModel.getUpdater(context);
     final day = AddSessionModel.dayOf(context);
-    final initText = DateFormat("EEEE, dd/MM/yyyy").format(day);
-    print("Init text: $initText");
+    final dayFormatted = DateFormat("EEEE, dd/MM/yyyy").format(day);
 
-    return InkWell(
+    return ListTile(
       onTap: () async {
         final picked = await showDatePicker(
           context: context,
@@ -25,12 +25,10 @@ class DayPicker extends StatelessWidget {
         if (picked == null) return;
         updater(day: picked);
       },
-      child: InputDecorator(
-        decoration: const InputDecoration(
-          labelText: "Ngày học",
-        ),
-        child: Text(initText),
-      ),
+      leading: Icon(Symbols.event),
+      title: Text("Ngày học"),
+      subtitle: Text(dayFormatted),
+      trailing: Icon(Symbols.edit),
     );
   }
 }

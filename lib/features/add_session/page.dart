@@ -1,4 +1,7 @@
+import 'package:checkin_tool/features/add_session/widgets/run_button.dart';
+import 'package:checkin_tool/features/add_session/widgets/time_picker.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/db_consumers.dart';
@@ -18,34 +21,51 @@ class AddSessionPage extends StatelessWidget {
       ),
       body: AddSessionScope(
         classId: classId,
-        child: SingleChildScrollView(
+        child: Padding(
           padding: EdgeInsets.all(context.gutter),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: context.gutter,
             children: [
-              /// Show class code
-              CourseClassConsumer(
-                id: classId,
-                builder:
-                    (context, courseClass) => ListTile(
-                      title: Text("Mã lớp"),
-                      subtitle: Text(courseClass.classCode),
-                    ),
-              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      /// Show class code
+                      CourseClassConsumer(
+                        id: classId,
+                        builder:
+                            (context, courseClass) => ListTile(
+                              leading: Icon(Symbols.numbers),
+                              title: Text("Mã lớp"),
+                              subtitle: Text(courseClass.classCode),
+                            ),
+                      ),
 
-              /// Show course
-              Divider(),
-              CourseClassConsumer(
-                id: classId,
-                builder:
-                    (context, courseClass) => ListTile(
-                      title: Text("Mã học phần"),
-                      subtitle: Text(courseClass.courseId),
-                    ),
-              ),
+                      /// Show course
+                      Divider(),
+                      CourseClassConsumer(
+                        id: classId,
+                        builder:
+                            (context, courseClass) => ListTile(
+                              leading: Icon(null),
+                              title: Text("Mã học phần"),
+                              subtitle: Text(courseClass.courseId),
+                            ),
+                      ),
 
-              // Day Picker
-              Divider(),
-              DayPicker(),
+                      // Day Picker
+                      Divider(),
+                      DayPicker(),
+                      Divider(),
+                      StartTimePicker(),
+                      Divider(),
+                      EndTimePicker(),
+                    ],
+                  ),
+                ),
+              ),
+              RunButton(),
             ],
           ),
         ),
