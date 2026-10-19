@@ -20,17 +20,12 @@ import '../../attendance/domain/dao.dart';
 /// Provide the exported xlsx file for the course-class's attendance data
 final classAttendanceXlsxProvider = FutureProvider.family(
   (ref, int courseClassId) async {
-    print("#0");
     final data = await ref.watch(_exportDataProvider(courseClassId).future);
-    print("#1");
     final bytes = await Isolate.run(
       () => _buildCourseClassAttendanceXlsx(data: data),
     );
-    print("2");
     final courseClass = await ref.watch(_classProvider(courseClassId).future);
-    print("3");
     final name = "CCTC-${courseClass.classCode}";
-    print(name);
     return NamedFile(name: name, bytes: bytes, extension: "xlsx");
   },
 );
@@ -51,9 +46,7 @@ final semesterAttendanceXlsxProvider = FutureProvider.family(
 
     final archive = Archive();
     for (final id in ids) {
-      print(id);
       final xlsx = await ref.watch(classAttendanceXlsxProvider(id).future);
-      print(xlsx);
       final file = ArchiveFile(xlsx.path, xlsx.bytes.length, xlsx.bytes);
       archive.addFile(file);
     }
@@ -354,7 +347,6 @@ double _calcAutoWidth(Data cell, {double padding = 0.08}) {
 }
 
 void _sheetAutoWidth(Sheet sheet, {double padding = 0.08}) {
-  print(("Max rows", sheet.maxRows));
   for (int columnIndex = 0; columnIndex < sheet.maxColumns; columnIndex++) {
     double maxWidth = 0;
 
