@@ -14,7 +14,7 @@ import '../../core/database_service.dart';
 import '../../core/notifiers.dart';
 
 extension _StringHelper on String {
-  static final numeric = RegExp(r"^[0-9 \n]$");
+  static final numeric = RegExp(r"^[0-9 \n]+$");
   static final spaces = RegExp(r"[\r\n\s]");
 
   bool get hasOnlyNumberAndSpace => numeric.hasMatch(this);

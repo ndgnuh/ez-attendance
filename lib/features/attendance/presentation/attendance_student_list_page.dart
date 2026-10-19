@@ -1,3 +1,6 @@
+// List the students in an attendance session
+library;
+
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
@@ -159,7 +162,6 @@ class AttendanceSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Built");
     return TextField(
       controller: searchTextController,
       inputFormatters: [NewLineToSpaceFormatter()],
