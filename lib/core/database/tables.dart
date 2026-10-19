@@ -134,6 +134,8 @@ class Session extends Table {
   DateTimeColumn get startTime => dateTime()();
   DateTimeColumn get endTime => dateTime()();
   BoolColumn get ignoreAttendance => boolean().clientDefault(() => false)();
+  BoolColumn get isHomework =>
+      boolean().withDefault(const Constant(false)).clientDefault(() => false)();
 }
 
 class Student extends Table {
