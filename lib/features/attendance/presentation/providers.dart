@@ -13,6 +13,13 @@ import '../domain/data_model.dart';
 
 final searchTextProvider = NotifierProvider(() => RequireStringNotifier(''));
 
+/// Which kind of sessions to show in the session list.
+enum SessionDisplayFilter { all, lessonOnly, homeworkOnly }
+
+final sessionDisplayFilterProvider = NotifierProvider(
+  () => RequiredStateNotifier(SessionDisplayFilter.all),
+);
+
 /// Provide the students and attendance status in an attendance session,
 /// filtered by the "smart search" using [searchTextProvider].
 /// All students are provided when the search query is empty.

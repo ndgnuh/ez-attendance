@@ -44,7 +44,15 @@ class AttendanceSessionListView extends ConsumerWidget {
       default:
     }
 
-    final sessionList = sessionListAsync.value!;
+    final filter = ref.watch(sessionDisplayFilterProvider);
+    final sessionList =
+        sessionListAsync.value!.where((s) {
+          return switch (filter) {
+            SessionDisplayFilter.all => true,
+            SessionDisplayFilter.lessonOnly => !s.isHomework,
+            SessionDisplayFilter.homeworkOnly => s.isHomework,
+          };
+        }).toList();
     if (sessionList.isEmpty) {
       return Center(
         child: Text("không có buổi điểm danh nào"),

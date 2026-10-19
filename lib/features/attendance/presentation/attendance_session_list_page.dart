@@ -6,8 +6,10 @@ import 'package:checkin_tool/core/db_consumers.dart';
 import 'package:checkin_tool/features/add_session/page.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import 'providers.dart';
 import 'widgets/attendance_session_list_view.dart';
 import 'widgets/session_create_button.dart';
 
@@ -66,20 +68,21 @@ class AttendanceSessionListPage extends StatelessWidget {
   }
 }
 
-class _PageMenu extends StatefulWidget {
+class _PageMenu extends ConsumerStatefulWidget {
   final int classId;
 
   const _PageMenu({required this.classId});
 
   @override
-  State<_PageMenu> createState() => _PageMenuState();
+  ConsumerState<_PageMenu> createState() => _PageMenuState();
 }
 
-class _PageMenuState extends State<_PageMenu> {
+class _PageMenuState extends ConsumerState<_PageMenu> {
   final MenuController controller = MenuController();
   @override
   Widget build(BuildContext context) {
     final classId = widget.classId;
+    final filter = ref.watch(sessionDisplayFilterProvider);
     return MenuAnchor(
       consumeOutsideTap: true,
       controller: controller,
@@ -98,6 +101,21 @@ class _PageMenuState extends State<_PageMenu> {
             controller.close();
           },
         ),
+        Divider(),
+        for (final (value, label) in [
+          (SessionDisplayFilter.all, "Tất cả"),
+          (SessionDisplayFilter.lessonOnly, "Chỉ buổi học"),
+          (SessionDisplayFilter.homeworkOnly, "Chỉ bài tập về nhà"),
+        ])
+          RadioMenuButton(
+            value: value,
+            groupValue: filter,
+            onChanged: (v) {
+              ref.read(sessionDisplayFilterProvider.notifier).setState(v!);
+              controller.close();
+            },
+            child: Text(label),
+          ),
       ],
       child: IconButton(
         onPressed: () => controller.open(),
