@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -139,17 +140,34 @@ class _ActionMenuState extends State<_ActionMenu> {
   }
 }
 
-class AttendanceSearchBar extends ConsumerWidget {
+class NewLineToSpaceFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final String replacedText = newValue.text.replaceAll('\n', ' ');
+    return newValue.copyWith(
+      text: replacedText,
+      selection: TextSelection.collapsed(offset: replacedText.length),
+    );
+  }
+}
+
+class AttendanceSearchBar extends StatelessWidget {
   const AttendanceSearchBar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    print("Built");
     return TextField(
       controller: searchTextController,
+      inputFormatters: [NewLineToSpaceFormatter()],
       decoration: InputDecoration(
         label: Text("Lọc sinh viên"),
         prefixIcon: Icon(Symbols.search),
       ),
+      maxLines: null,
       focusNode: focusNode(searchTextController),
     );
   }
