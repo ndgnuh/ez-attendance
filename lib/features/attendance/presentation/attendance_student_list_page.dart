@@ -1,6 +1,8 @@
 // List the students in an attendance session
 library;
 
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
@@ -157,24 +159,57 @@ class NewLineToSpaceFormatter extends TextInputFormatter {
   }
 }
 
-class AttendanceSearchBar extends StatelessWidget {
+class AttendanceSearchBar extends ConsumerStatefulWidget {
   const AttendanceSearchBar({super.key});
+
+  @override
+  ConsumerState<AttendanceSearchBar> createState() =>
+      _AttendanceSearchBarState();
+}
+
+class _AttendanceSearchBarState extends ConsumerState<AttendanceSearchBar> {
+  late final searchTextController = TextEditingController(
+    text: ref.read(searchTextProvider),
+  );
+
+  late final focusNode = createFocusNode(searchTextController);
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    focusNode.dispose();
+    searchTextController.dispose();
+    super.dispose();
+  }
+
+  /// Commits the current text to [searchTextProvider], dropping any pending
+  /// debounced commit.
+  void _commit() {
+    _debounce?.cancel();
+    ref.read(searchTextProvider.notifier).setState(searchTextController.text);
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: searchTextController,
+      onChanged: (_) {
+        _debounce?.cancel();
+        _debounce = Timer(const Duration(milliseconds: 150), _commit);
+      },
+      onSubmitted: (_) => _commit(),
       inputFormatters: [NewLineToSpaceFormatter()],
       decoration: InputDecoration(
         label: Text("Lọc sinh viên"),
         prefixIcon: Icon(Symbols.search),
       ),
       maxLines: null,
-      focusNode: focusNode(searchTextController),
+      focusNode: focusNode,
     );
   }
 
-  FocusNode focusNode(TextEditingController controller) {
+  FocusNode createFocusNode(TextEditingController controller) {
     final focusNode = FocusNode();
     focusNode.addListener(() {
       if (focusNode.hasPrimaryFocus) {
@@ -182,6 +217,8 @@ class AttendanceSearchBar extends StatelessWidget {
           baseOffset: 0,
           extentOffset: controller.text.length,
         );
+      } else if (!focusNode.hasFocus) {
+        _commit();
       }
     });
 

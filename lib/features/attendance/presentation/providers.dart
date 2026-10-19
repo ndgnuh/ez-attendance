@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:checkin_tool/core/notifiers.dart';
 import 'package:checkin_tool/core/preference_service.dart';
 import 'package:drift/drift.dart';
 import 'package:material_ui/material_ui.dart';
@@ -10,11 +11,7 @@ import '../../student_search/student_search.dart' show searchStudents;
 import '../domain/dao.dart';
 import '../domain/data_model.dart';
 
-final searchTextController = TextEditingController();
-final searchTextProvider = Provider((ref) {
-  searchTextController.addListener(() => ref.invalidateSelf());
-  return searchTextController.text;
-});
+final searchTextProvider = NotifierProvider(() => RequireStringNotifier(''));
 
 /// Provide the students and attendance status in an attendance session,
 /// filtered by the "smart search" using [searchTextProvider].
