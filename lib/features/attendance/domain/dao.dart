@@ -18,6 +18,14 @@ extension Dao on AppDatabase {
     return stmt;
   }
 
+  /// Update the fields of a [Session] set in [companion].
+  /// Returns the number of updated rows.
+  Future<int> updateSession(int sessionId, SessionCompanion companion) {
+    final stmt = update(session);
+    stmt.where((r) => r.id.equals(sessionId));
+    return stmt.write(companion);
+  }
+
   /// Create attendance session for a course class  [id]
   /// Insert all  the student from thencourse class to the attendance record
   /// The default attendance status is [absent]

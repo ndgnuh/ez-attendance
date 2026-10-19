@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/router.dart';
+import '../../domain/dao.dart';
 import '../providers.dart';
 
 final _dateFormat = DateFormat("dd/MM/yyyy");
@@ -106,12 +107,9 @@ class _SessionOptionsSheet extends ConsumerWidget {
     required this.sessionId,
   });
 
-  // TODO: move to DAO layer.
   Future<void> _update(WidgetRef ref, SessionCompanion companion) async {
     final db = await ref.read(databaseProvider.future);
-    final stmt = db.update(db.session);
-    stmt.where((r) => r.id.equals(sessionId));
-    await stmt.write(companion);
+    await db.updateSession(sessionId, companion);
   }
 
   @override
