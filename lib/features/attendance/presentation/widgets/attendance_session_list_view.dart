@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/router.dart';
+import '../../domain/dao.dart';
 import '../providers.dart';
 
 final _dateFormat = DateFormat("dd/MM/yyyy");
@@ -43,7 +44,15 @@ class AttendanceSessionListView extends ConsumerWidget {
       default:
     }
 
-    final sessionList = sessionListAsync.value!;
+    final filter = ref.watch(sessionDisplayFilterProvider);
+    final sessionList =
+        sessionListAsync.value!.where((s) {
+          return switch (filter) {
+            SessionDisplayFilter.all => true,
+            SessionDisplayFilter.lessonOnly => !s.isHomework,
+            SessionDisplayFilter.homeworkOnly => s.isHomework,
+          };
+        }).toList();
     if (sessionList.isEmpty) {
       return Center(
         child: Text("không có buổi điểm danh nào"),
@@ -67,7 +76,8 @@ class AttendanceSessionListView extends ConsumerWidget {
         };
         final leading = Icon(iconData, color: iconColor);
 
-        final title = "Buổi học ${_dateFormat.format(session.startTime)}";
+        final prefix = session.isHomework ? "BTVN" : "Buổi học";
+        final title = "$prefix ${_dateFormat.format(session.startTime)}";
         final startTime = session.startTime;
         final endTime = session.endTime;
 
@@ -81,19 +91,65 @@ class AttendanceSessionListView extends ConsumerWidget {
           subtitle: Text(subtitle),
           trailing: Icon(Symbols.chevron_forward),
           onTap: () => router.toAttendanceSessionStudentListPage(session.id),
-          onLongPress: () async {
-            // TODO: move to DAO layer.
-            final db = await ref.watch(databaseProvider.future);
-            final stmt = db.update(db.session);
-            stmt.where((r) => r.id.equals(session.id));
-            stmt.write(
-              SessionCompanion(
-                ignoreAttendance: Value(!session.ignoreAttendance),
-              ),
-            );
-          },
+          onLongPress: () => showModalBottomSheet(
+            context: context,
+            builder: (_) => _SessionOptionsSheet(
+              courseClassId: courseClassId,
+              sessionId: session.id,
+            ),
+          ),
         );
       },
+    );
+  }
+}
+
+/// Modal to edit the attendance and type of a session.
+/// Watches the session list so the switches follow the database.
+class _SessionOptionsSheet extends ConsumerWidget {
+  final int courseClassId;
+  final int sessionId;
+
+  const _SessionOptionsSheet({
+    required this.courseClassId,
+    required this.sessionId,
+  });
+
+  Future<void> _update(WidgetRef ref, SessionCompanion companion) async {
+    final db = await ref.read(databaseProvider.future);
+    await db.updateSession(sessionId, companion);
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sessionList = ref
+        .watch(attendanceSessionListProvider(courseClassId))
+        .value;
+    final session = sessionList?.where((s) => s.id == sessionId).firstOrNull;
+    if (session == null) return SizedBox.shrink();
+
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SwitchListTile(
+            secondary: Icon(Symbols.person_check),
+            title: Text("Điểm danh"),
+            value: !session.ignoreAttendance && !session.isHomework,
+            onChanged: session.isHomework
+                ? null
+                : (value) =>
+                    _update(ref, SessionCompanion(ignoreAttendance: Value(!value))),
+          ),
+          SwitchListTile(
+            secondary: Icon(Symbols.assignment),
+            title: Text("Bài tập về nhà (BTVN)"),
+            value: session.isHomework,
+            onChanged: (value) =>
+                _update(ref, SessionCompanion(isHomework: Value(value))),
+          ),
+        ],
+      ),
     );
   }
 }

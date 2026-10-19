@@ -156,6 +156,12 @@ class AppDatabase extends _$AppDatabase {
             "UPDATE session SET end_time = start_time WHERE end_time IS NULL",
           );
         },
+
+        /// Version 6:
+        /// Add is_homework to the session
+        from5To6: (migrator, schema) async {
+          await migrator.addColumn(schema.session, schema.session.isHomework);
+        },
       ),
       beforeOpen: (details) async {
         if (details.hadUpgrade || details.wasCreated) {
@@ -171,7 +177,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   SimpleSelectStatement<Course, CourseData> searchCourse({
     String? id,

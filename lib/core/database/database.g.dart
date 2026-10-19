@@ -1393,6 +1393,22 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
     ),
     clientDefault: () => false,
   );
+  static const VerificationMeta _isHomeworkMeta = const VerificationMeta(
+    'isHomework',
+  );
+  @override
+  late final GeneratedColumn<bool> isHomework = GeneratedColumn<bool>(
+    'is_homework',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_homework" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+    clientDefault: () => false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1400,6 +1416,7 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
     startTime,
     endTime,
     ignoreAttendance,
+    isHomework,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1452,6 +1469,12 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
         ),
       );
     }
+    if (data.containsKey('is_homework')) {
+      context.handle(
+        _isHomeworkMeta,
+        isHomework.isAcceptableOrUnknown(data['is_homework']!, _isHomeworkMeta),
+      );
+    }
     return context;
   }
 
@@ -1486,6 +1509,11 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
             DriftSqlType.bool,
             data['${effectivePrefix}ignore_attendance'],
           )!,
+      isHomework:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_homework'],
+          )!,
     );
   }
 
@@ -1501,12 +1529,14 @@ class SessionData extends DataClass implements Insertable<SessionData> {
   final DateTime startTime;
   final DateTime endTime;
   final bool ignoreAttendance;
+  final bool isHomework;
   const SessionData({
     required this.id,
     required this.courseClassId,
     required this.startTime,
     required this.endTime,
     required this.ignoreAttendance,
+    required this.isHomework,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1516,6 +1546,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
     map['start_time'] = Variable<DateTime>(startTime);
     map['end_time'] = Variable<DateTime>(endTime);
     map['ignore_attendance'] = Variable<bool>(ignoreAttendance);
+    map['is_homework'] = Variable<bool>(isHomework);
     return map;
   }
 
@@ -1526,6 +1557,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
       startTime: Value(startTime),
       endTime: Value(endTime),
       ignoreAttendance: Value(ignoreAttendance),
+      isHomework: Value(isHomework),
     );
   }
 
@@ -1540,6 +1572,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
       startTime: serializer.fromJson<DateTime>(json['startTime']),
       endTime: serializer.fromJson<DateTime>(json['endTime']),
       ignoreAttendance: serializer.fromJson<bool>(json['ignoreAttendance']),
+      isHomework: serializer.fromJson<bool>(json['isHomework']),
     );
   }
   @override
@@ -1551,6 +1584,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
       'startTime': serializer.toJson<DateTime>(startTime),
       'endTime': serializer.toJson<DateTime>(endTime),
       'ignoreAttendance': serializer.toJson<bool>(ignoreAttendance),
+      'isHomework': serializer.toJson<bool>(isHomework),
     };
   }
 
@@ -1560,12 +1594,14 @@ class SessionData extends DataClass implements Insertable<SessionData> {
     DateTime? startTime,
     DateTime? endTime,
     bool? ignoreAttendance,
+    bool? isHomework,
   }) => SessionData(
     id: id ?? this.id,
     courseClassId: courseClassId ?? this.courseClassId,
     startTime: startTime ?? this.startTime,
     endTime: endTime ?? this.endTime,
     ignoreAttendance: ignoreAttendance ?? this.ignoreAttendance,
+    isHomework: isHomework ?? this.isHomework,
   );
   SessionData copyWithCompanion(SessionCompanion data) {
     return SessionData(
@@ -1580,6 +1616,8 @@ class SessionData extends DataClass implements Insertable<SessionData> {
           data.ignoreAttendance.present
               ? data.ignoreAttendance.value
               : this.ignoreAttendance,
+      isHomework:
+          data.isHomework.present ? data.isHomework.value : this.isHomework,
     );
   }
 
@@ -1590,14 +1628,21 @@ class SessionData extends DataClass implements Insertable<SessionData> {
           ..write('courseClassId: $courseClassId, ')
           ..write('startTime: $startTime, ')
           ..write('endTime: $endTime, ')
-          ..write('ignoreAttendance: $ignoreAttendance')
+          ..write('ignoreAttendance: $ignoreAttendance, ')
+          ..write('isHomework: $isHomework')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, courseClassId, startTime, endTime, ignoreAttendance);
+  int get hashCode => Object.hash(
+    id,
+    courseClassId,
+    startTime,
+    endTime,
+    ignoreAttendance,
+    isHomework,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1606,7 +1651,8 @@ class SessionData extends DataClass implements Insertable<SessionData> {
           other.courseClassId == this.courseClassId &&
           other.startTime == this.startTime &&
           other.endTime == this.endTime &&
-          other.ignoreAttendance == this.ignoreAttendance);
+          other.ignoreAttendance == this.ignoreAttendance &&
+          other.isHomework == this.isHomework);
 }
 
 class SessionCompanion extends UpdateCompanion<SessionData> {
@@ -1615,12 +1661,14 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
   final Value<DateTime> startTime;
   final Value<DateTime> endTime;
   final Value<bool> ignoreAttendance;
+  final Value<bool> isHomework;
   const SessionCompanion({
     this.id = const Value.absent(),
     this.courseClassId = const Value.absent(),
     this.startTime = const Value.absent(),
     this.endTime = const Value.absent(),
     this.ignoreAttendance = const Value.absent(),
+    this.isHomework = const Value.absent(),
   });
   SessionCompanion.insert({
     this.id = const Value.absent(),
@@ -1628,6 +1676,7 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
     required DateTime startTime,
     required DateTime endTime,
     this.ignoreAttendance = const Value.absent(),
+    this.isHomework = const Value.absent(),
   }) : courseClassId = Value(courseClassId),
        startTime = Value(startTime),
        endTime = Value(endTime);
@@ -1637,6 +1686,7 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
     Expression<DateTime>? startTime,
     Expression<DateTime>? endTime,
     Expression<bool>? ignoreAttendance,
+    Expression<bool>? isHomework,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1644,6 +1694,7 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
       if (startTime != null) 'start_time': startTime,
       if (endTime != null) 'end_time': endTime,
       if (ignoreAttendance != null) 'ignore_attendance': ignoreAttendance,
+      if (isHomework != null) 'is_homework': isHomework,
     });
   }
 
@@ -1653,6 +1704,7 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
     Value<DateTime>? startTime,
     Value<DateTime>? endTime,
     Value<bool>? ignoreAttendance,
+    Value<bool>? isHomework,
   }) {
     return SessionCompanion(
       id: id ?? this.id,
@@ -1660,6 +1712,7 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       ignoreAttendance: ignoreAttendance ?? this.ignoreAttendance,
+      isHomework: isHomework ?? this.isHomework,
     );
   }
 
@@ -1681,6 +1734,9 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
     if (ignoreAttendance.present) {
       map['ignore_attendance'] = Variable<bool>(ignoreAttendance.value);
     }
+    if (isHomework.present) {
+      map['is_homework'] = Variable<bool>(isHomework.value);
+    }
     return map;
   }
 
@@ -1691,7 +1747,8 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
           ..write('courseClassId: $courseClassId, ')
           ..write('startTime: $startTime, ')
           ..write('endTime: $endTime, ')
-          ..write('ignoreAttendance: $ignoreAttendance')
+          ..write('ignoreAttendance: $ignoreAttendance, ')
+          ..write('isHomework: $isHomework')
           ..write(')'))
         .toString();
   }
@@ -4244,6 +4301,7 @@ typedef $$SessionTableCreateCompanionBuilder =
       required DateTime startTime,
       required DateTime endTime,
       Value<bool> ignoreAttendance,
+      Value<bool> isHomework,
     });
 typedef $$SessionTableUpdateCompanionBuilder =
     SessionCompanion Function({
@@ -4252,6 +4310,7 @@ typedef $$SessionTableUpdateCompanionBuilder =
       Value<DateTime> startTime,
       Value<DateTime> endTime,
       Value<bool> ignoreAttendance,
+      Value<bool> isHomework,
     });
 
 final class $$SessionTableReferences
@@ -4320,6 +4379,11 @@ class $$SessionTableFilterComposer
 
   ColumnFilters<bool> get ignoreAttendance => $composableBuilder(
     column: $table.ignoreAttendance,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isHomework => $composableBuilder(
+    column: $table.isHomework,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4401,6 +4465,11 @@ class $$SessionTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get isHomework => $composableBuilder(
+    column: $table.isHomework,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$CourseClassTableOrderingComposer get courseClassId {
     final $$CourseClassTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -4445,6 +4514,11 @@ class $$SessionTableAnnotationComposer
 
   GeneratedColumn<bool> get ignoreAttendance => $composableBuilder(
     column: $table.ignoreAttendance,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isHomework => $composableBuilder(
+    column: $table.isHomework,
     builder: (column) => column,
   );
 
@@ -4530,12 +4604,14 @@ class $$SessionTableTableManager
                 Value<DateTime> startTime = const Value.absent(),
                 Value<DateTime> endTime = const Value.absent(),
                 Value<bool> ignoreAttendance = const Value.absent(),
+                Value<bool> isHomework = const Value.absent(),
               }) => SessionCompanion(
                 id: id,
                 courseClassId: courseClassId,
                 startTime: startTime,
                 endTime: endTime,
                 ignoreAttendance: ignoreAttendance,
+                isHomework: isHomework,
               ),
           createCompanionCallback:
               ({
@@ -4544,12 +4620,14 @@ class $$SessionTableTableManager
                 required DateTime startTime,
                 required DateTime endTime,
                 Value<bool> ignoreAttendance = const Value.absent(),
+                Value<bool> isHomework = const Value.absent(),
               }) => SessionCompanion.insert(
                 id: id,
                 courseClassId: courseClassId,
                 startTime: startTime,
                 endTime: endTime,
                 ignoreAttendance: ignoreAttendance,
+                isHomework: isHomework,
               ),
           withReferenceMapper:
               (p0) =>
