@@ -9,7 +9,6 @@ export './database/database.dart';
 
 final databaseProvider = FutureProvider<AppDatabase>((ref) async {
   final dbPath = await ref.watch(appDatabasePathProvider.future);
-  print("Database path: $dbPath");
   if (dbPath == null) {
     throw Exception('Database path is not set');
   }

@@ -18,7 +18,7 @@ class AttendanceCheckList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final attendanceListAsync = ref.watch(
-      attendanceListProvider(sessionId),
+      filteredStudentsProvider(sessionId),
     );
 
     // Handle loading and errors

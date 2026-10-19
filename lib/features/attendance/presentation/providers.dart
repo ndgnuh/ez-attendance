@@ -1,34 +1,40 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:checkin_tool/core/notifiers.dart';
 import 'package:checkin_tool/core/preference_service.dart';
 import 'package:drift/drift.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:riverpod/riverpod.dart';
 
+import '../../student_search/student_search.dart' show searchStudents;
 import '../domain/dao.dart';
 import '../domain/data_model.dart';
 
-final searchTextController = TextEditingController();
-final searchTextProvider = Provider((ref) {
-  searchTextController.addListener(() => ref.invalidateSelf());
-  return searchTextController.text;
-});
+final searchTextProvider = NotifierProvider(() => RequireStringNotifier(''));
 
-/// Provide all the student and attendance status
-/// in and attendance session.
-/// Depends on [searchTextProvider] for filtering students.
-final attendanceListProvider = StreamProvider.family(
+/// Provide the students and attendance status in an attendance session,
+/// filtered by the "smart search" using [searchTextProvider].
+/// All students are provided when the search query is empty.
+final filteredStudentsProvider = StreamProvider.family(
   (ref, int sessionId) async* {
     final db = await ref.watch(databaseProvider.future);
     final searchText = ref.watch(searchTextProvider);
-    final stmt = db.getAttendanceList(
-      sessionId: sessionId,
-      searchText: searchText,
-    );
+    final stmt = db.getAttendanceList(sessionId: sessionId, searchText: '');
+
+    if (searchText.isEmpty) {
+      yield* stmt.watch();
+      return;
+    }
 
     await for (final result in stmt.watch()) {
-      yield result;
+      final matches =
+          await searchStudents(
+            db: db,
+            searchQuery: searchText,
+          ).get();
+      final ids = matches.map((student) => student.id).toSet();
+      yield result.where((row) => ids.contains(row.$1.id)).toList();
     }
   },
 );
