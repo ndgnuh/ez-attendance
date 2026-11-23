@@ -1,6 +1,6 @@
-import 'package:checkin_tool/core/router.dart';
-import 'package:checkin_tool/features/attendance/domain/dao.dart';
-import 'package:checkin_tool/features/attendance/domain/data_model.dart';
+import '../../../../core/router.dart';
+import '../../../attendance/domain/dao.dart';
+import '../../../attendance/domain/data_model.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

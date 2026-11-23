@@ -2,7 +2,7 @@
 /// of database items and pass it to a builder.
 library;
 
-import 'package:checkin_tool/core/database_service.dart';
+import '../core/database_service.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 

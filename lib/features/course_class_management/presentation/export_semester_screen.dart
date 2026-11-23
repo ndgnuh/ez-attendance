@@ -2,7 +2,7 @@
 /// Xuất điểm danh của cả kỳ trong một file zip.
 library;
 
-import 'package:checkin_tool/features/course_class_management/domain/export_logic.dart';
+import '../domain/export_logic.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';

@@ -2,8 +2,8 @@
 
 import 'dart:io';
 
-import 'package:checkin_tool/shared/context.dart';
-import 'package:checkin_tool/shared/dialogs.dart';
+import '../../../shared/context.dart';
+import '../../../shared/dialogs.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart' as path;

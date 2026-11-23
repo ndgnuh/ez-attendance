@@ -2,7 +2,7 @@
 /// Export [AttendanceSessionListView] widget.
 library;
 
-import 'package:checkin_tool/core/database_service.dart';
+import '../../../../core/database_service.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';

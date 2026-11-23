@@ -1,5 +1,5 @@
-import 'package:checkin_tool/features/add_session/widgets/run_button.dart';
-import 'package:checkin_tool/features/add_session/widgets/time_picker.dart';
+import 'widgets/run_button.dart';
+import 'widgets/time_picker.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:material_ui/material_ui.dart';

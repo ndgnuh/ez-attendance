@@ -1,4 +1,4 @@
-import 'package:checkin_tool/features/gui/screens/timer_creation.dart';
+import '../../gui/screens/timer_creation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -63,6 +63,13 @@ class _SettingsTab extends StatelessWidget {
           CardSection(
             title: "Cài đặt",
             children: [
+              ListTile(
+                title: Text("Đồng bộ"),
+                subtitle: Text("Đồng bộ thiết bị local"),
+                onTap: () {
+                  // router.toInitialSetupPage();
+                },
+              ),
               ListTile(
                 title: Text("Cài đặt"),
                 subtitle: Text("Tới trang cài đặt"),

@@ -1,5 +1,5 @@
-import 'package:checkin_tool/core/database/database.dart';
-import 'package:checkin_tool/core/enums.dart';
+import '../../core/database/database.dart';
+import '../../core/enums.dart';
 import 'package:drift/drift.dart';
 import 'package:material_ui/material_ui.dart';
 

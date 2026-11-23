@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:checkin_tool/core/notifiers.dart';
-import 'package:checkin_tool/core/preference_service.dart';
+import '../../../core/notifiers.dart';
+import '../../../core/preference_service.dart';
 import 'package:drift/drift.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:riverpod/riverpod.dart';

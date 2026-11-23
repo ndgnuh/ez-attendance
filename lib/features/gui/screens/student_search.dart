@@ -1,4 +1,4 @@
-import 'package:checkin_tool/core/router.dart';
+import '../../../core/router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';

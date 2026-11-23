@@ -1,6 +1,6 @@
-import 'package:checkin_tool/core/database_service.dart';
-import 'package:checkin_tool/features/add_session/database.dart';
-import 'package:checkin_tool/features/add_session/widgets/time_picker.dart';
+import '../../core/database_service.dart';
+import 'database.dart';
+import 'widgets/time_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 

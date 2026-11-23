@@ -1,16 +1,16 @@
-import 'package:checkin_tool/features/course_class_management/presentation/period_tile.dart';
-import 'package:checkin_tool/features/course_class_management/presentation/widgets/export_button.dart';
-import 'package:checkin_tool/features/course_class_management/presentation/widgets/location_edit_tile.dart';
-import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../core/router.dart';
 import '../../../design.dart';
 import '../domain/dao.dart';
 import '../domain/models.dart';
+import 'period_tile.dart';
 import 'widgets/day_of_week_tile.dart';
+import 'widgets/export_button.dart';
+import 'widgets/location_edit_tile.dart';
 
 class CourseClassDeleteButton extends StatelessWidget {
   final Function(BuildContext, VoidCallback) builder;
@@ -91,21 +91,6 @@ class CourseClassDetailsPage extends StatelessWidget {
       //     _GeneralInfoTab(id: id),
       //   ],
       // ),
-    );
-  }
-}
-
-class _ClassStudentsTab extends ConsumerWidget {
-  final int id;
-  const _ClassStudentsTab({required this.id});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: EdgeInsets.all(context.gutter),
-      child: Column(
-        children: [],
-      ),
     );
   }
 }

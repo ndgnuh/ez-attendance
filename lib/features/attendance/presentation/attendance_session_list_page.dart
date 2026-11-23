@@ -2,8 +2,8 @@
 /// Export [AttendanceSessionListPage] widget (a page).
 library;
 
-import 'package:checkin_tool/core/db_consumers.dart';
-import 'package:checkin_tool/features/add_session/page.dart';
+import '../../../core/db_consumers.dart';
+import '../../add_session/page.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

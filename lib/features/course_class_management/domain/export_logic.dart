@@ -8,7 +8,7 @@ import 'dart:isolate';
 import 'dart:math' as math;
 
 import 'package:archive/archive.dart';
-import 'package:checkin_tool/features/course_class_management/domain/dao.dart';
+import 'dao.dart';
 import 'package:drift/drift.dart';
 import 'package:excel/excel.dart';
 import 'package:intl/intl.dart';
